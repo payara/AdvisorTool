@@ -40,7 +40,10 @@
 package fish.payara.advisor;
 
 public class AdvisorMessage {
-    
+
+    public static final String YELLOW = "\033[0;33m";
+    public static final String RESET = "\033[0m";
+    public static final String BLUE = "\033[0;34m";
     private String message;
     private String fix;
 
@@ -67,7 +70,7 @@ public class AdvisorMessage {
 
     @Override
     public String toString() {
-        return message + "\n"+ fix;
+        return YELLOW + message + RESET + "\n" + BLUE + fix + RESET;
     }
 
     public static class AdvisorMessageBuilder {

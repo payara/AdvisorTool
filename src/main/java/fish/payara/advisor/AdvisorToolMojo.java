@@ -63,14 +63,16 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-@Mojo(name = "advisor-tool", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "advisorTool", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
 
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
+    
+    private static final String ADVISE_VERSION = "adviseVersion";
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    @Parameter(property = "advisor-tool.adviseVersion", defaultValue = "jakarta10")
+    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "")
     private String adviseVersion;
 
 
@@ -78,6 +80,8 @@ public class AdvisorToolMojo extends AbstractMojo {
     public void execute() {
         Properties patterns = null;
         List<AdvisorBean> advisorBeans = null;
+        Properties properties = System.getProperties();
+        this.adviseVersion = properties.getProperty(ADVISE_VERSION);
         try {
             //check if advise-version parameter was set
             if(adviseVersion != null && !adviseVersion.isEmpty()) {
@@ -105,12 +109,12 @@ public class AdvisorToolMojo extends AbstractMojo {
 
     public Properties loadPatterns(String version) throws URISyntaxException, IOException {
         //validate configurations
-        URI uriVersion = this.getClass().getClassLoader().getResource("config/"+version).toURI();
+        URI uriVersion = AdvisorToolMojo.class.getClassLoader().getResource("config/"+version).toURI();
         if(uriVersion == null) {
             log.severe(String.format("Not available configurations for the indicated version %s", version));
             return null;
         }
-        URI uriBaseFolder = this.getClass().getClassLoader().getResource("config/"+version+"/mappedPatterns").toURI();
+        URI uriBaseFolder = AdvisorToolMojo.class.getClassLoader().getResource("config/"+version+"/mappedPatterns").toURI();
         Properties readPatterns = new Properties();
         Path internalPath = null;
         if(uriBaseFolder.getScheme().equals("jar")) {
@@ -124,7 +128,8 @@ public class AdvisorToolMojo extends AbstractMojo {
             for (Iterator<Path> it = walk.iterator(); it.hasNext();){
                 Path p = it.next();
                 if(p.getFileName().toString().contains(".properties")) {
-                    readPatterns.load(this.getClass().getResourceAsStream(p.toString()));
+                    getLog().info("Read file Stream:"+p.toString());
+                    readPatterns.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
             }
         }
@@ -170,7 +175,7 @@ public class AdvisorToolMojo extends AbstractMojo {
         advisorMethodBeanList.forEach(b -> {
             URI baseMessageFolder = null;
             try {
-                baseMessageFolder = this.getClass().getClassLoader().getResource(url).toURI();
+                baseMessageFolder = AdvisorToolMojo.class.getClassLoader().getResource(url).toURI();
 
                 Properties messageProperties = new Properties();
                 Path internalPath = null;
@@ -224,11 +229,11 @@ public class AdvisorToolMojo extends AbstractMojo {
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
                 Path p = it.next();
                 if (type.equals("message") && p.getFileName().toString().contains((String) fileMessageName)) {
-                    messageProperties.load(this.getClass().getResourceAsStream(p.toString()));
+                    messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
 
                 if (type.equals("fix") && p.getFileName().toString().contains((String) fileFix)) {
-                    messageProperties.load(this.getClass().getResourceAsStream(p.toString()));
+                    messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
                 
             }
