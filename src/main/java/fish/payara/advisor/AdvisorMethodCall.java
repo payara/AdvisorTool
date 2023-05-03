@@ -40,51 +40,37 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
 public class AdvisorMethodCall implements AdvisorInterface {
-    
+
     @Override
-    public AdvisorBean parseFile(String keyPattern, String valuePattern, File f) throws FileNotFoundException {
-        List<AdvisorBean> advisorMethodBeanList = new ArrayList<>();
-        VoidVisitor<List<AdvisorBean>> methodCallCollector = 
-                new MethodCallCollector(keyPattern, valuePattern);
-        CompilationUnit compilationUnit = StaticJavaParser.parse(f);
-        methodCallCollector.visit(compilationUnit, advisorMethodBeanList);
-        if(advisorMethodBeanList != null && advisorMethodBeanList.size() > 0){
-            AdvisorBean b = advisorMethodBeanList.get(0);
-            b.setFile(f);
-            return b;
-        }
-        return null;
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
+        return new MethodCallCollector(keyPattern, valuePattern);
     }
 
     private static class MethodCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         
-        private String keyPattern;
-        private String valuePattern;
+        private final String keyPattern;
+        private final String valuePattern;
         
         public MethodCallCollector(String keyPattern, String valuePattern) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
         }
-        
+
         public void visit(MethodCallExpr methodCall, List<AdvisorBean> collector) {
             super.visit(methodCall, collector);
             Optional<Position> p = methodCall.getBegin();
-            if(methodCall.toString().contains(valuePattern)) {
+            if (methodCall.toString().contains(valuePattern)) {
                 AdvisorBean advisorMethodBean = new AdvisorBean.
-                        AdvisorBeanBuilder(keyPattern,valuePattern).
-                        setLine(((p.isPresent()) ? ""+p.get().line : "")).
+                        AdvisorBeanBuilder(keyPattern, valuePattern).
+                        setLine((p.map(position -> "" + position.line).orElse(""))).
                         setMethodDeclaration(methodCall.asMethodCallExpr().toString()).build();
                 collector.add(advisorMethodBean);
             }
