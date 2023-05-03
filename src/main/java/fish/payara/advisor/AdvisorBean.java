@@ -40,10 +40,12 @@
 package fish.payara.advisor;
 
 import java.io.File;
+import java.util.Objects;
 
 public class AdvisorBean {
     private File file;
     private String methodDeclaration;
+    private String importDeclaration;
     private String line;
 
     private String keyPattern;
@@ -53,7 +55,8 @@ public class AdvisorBean {
     
     private AdvisorBean(AdvisorBeanBuilder advisorBeanBuilder) {
         this.file = advisorBeanBuilder.file;
-        this.methodDeclaration = advisorBeanBuilder.methodDeclaration;;
+        this.methodDeclaration = advisorBeanBuilder.methodDeclaration;
+        this.importDeclaration = advisorBeanBuilder.importDeclaration;
         this.line = advisorBeanBuilder.line;
         this.keyPattern = advisorBeanBuilder.keyPattern;
         this.valuePattern = advisorBeanBuilder.valuePattern;
@@ -74,6 +77,14 @@ public class AdvisorBean {
 
     public void setMethodDeclaration(String methodDeclaration) {
         this.methodDeclaration = methodDeclaration;
+    }
+
+    public String getImportDeclaration() {
+        return importDeclaration;
+    }
+
+    public void setImportDeclaration(String importDeclaration) {
+        this.importDeclaration = importDeclaration;
     }
 
     public String getLine() {
@@ -110,19 +121,28 @@ public class AdvisorBean {
 
     @Override
     public String toString() {
-        return "Line of code:" + line + "  Expression:" + methodDeclaration +"\n"+
-                "Source file:"+file.getName() + "\n"+
+        return "Line of code: " + line + " | Expression: " + getExpression() +"\n"+
+                "Source file: "+file.getName() + "\n"+
                 advisorMessage.toString();
+    }
+
+    private String getExpression() {
+        if (methodDeclaration != null) {
+            return methodDeclaration;
+        }
+
+        return Objects.requireNonNullElse(importDeclaration, "");
     }
 
     public static class AdvisorBeanBuilder {
         private File file;
         private String methodDeclaration;
+        private String importDeclaration;
         private String line;
 
-        private String keyPattern;
+        final private String keyPattern;
+        final private String valuePattern;
 
-        private String valuePattern;
         private AdvisorMessage advisorMessage;
 
         public AdvisorBeanBuilder(String keyPattern, String valuePattern) {
@@ -139,7 +159,12 @@ public class AdvisorBean {
             this.methodDeclaration = methodDeclaration;
             return this;
         }
-        
+
+        public AdvisorBeanBuilder setImportDeclaration(String importDeclaration) {
+            this.importDeclaration = importDeclaration;
+            return this;
+        }
+
         public AdvisorBeanBuilder setLine(String line) {
            this.line = line;
            return this;
