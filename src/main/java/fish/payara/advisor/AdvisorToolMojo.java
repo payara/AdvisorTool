@@ -64,7 +64,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-@Mojo(name = "advisorTool", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "advise", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
 
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
@@ -73,7 +73,7 @@ public class AdvisorToolMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "")
+    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
 
 
@@ -82,11 +82,11 @@ public class AdvisorToolMojo extends AbstractMojo {
         Properties patterns = null;
         List<AdvisorBean> advisorBeans = Collections.emptyList();
         Properties properties = System.getProperties();
-        this.adviseVersion = properties.getProperty(ADVISE_VERSION);
+        if(properties.getProperty(ADVISE_VERSION) != null) {
+            this.adviseVersion = properties.getProperty(ADVISE_VERSION);
+        }
         try {
-            //check if advise-version parameter was set
             if(adviseVersion != null && !adviseVersion.isEmpty()) {
-                //loadPatterns
                 patterns = loadPatterns(adviseVersion);
             } else {
                 log.severe("You need to indicate adviseVersion option");
@@ -108,17 +108,17 @@ public class AdvisorToolMojo extends AbstractMojo {
 
     public Properties loadPatterns(String version) throws URISyntaxException, IOException {
         //validate configurations
-        if(AdvisorToolMojo.class.getClassLoader().getResource("config/"+version) == null) {
+        if(AdvisorToolMojo.class.getClassLoader().getResource("config/jakarta"+version) == null) {
             log.severe(String.format("Not available configurations for the indicated version %s", version));
             return null;
         }
         URI uriBaseFolder = Objects.requireNonNull(AdvisorToolMojo.class.getClassLoader().getResource(
-                "config/" + version + "/mappedPatterns")).toURI();
+                "config/jakarta" + version + "/mappedPatterns")).toURI();
         Properties readPatterns = new Properties();
         Path internalPath = null;
         if(uriBaseFolder.getScheme().equals("jar")) {
             FileSystem fileSystem = FileSystems.newFileSystem(uriBaseFolder, Collections.<String, Object>emptyMap());
-            internalPath = fileSystem.getPath("config/"+version+"/mappedPatterns");
+            internalPath = fileSystem.getPath("config/jakarta"+version+"/mappedPatterns");
         } else {
             internalPath = Paths.get(uriBaseFolder);
         }
@@ -195,8 +195,8 @@ public class AdvisorToolMojo extends AbstractMojo {
     }
     
     public void addMessages(List<AdvisorBean> advisorMethodBeanList) {
-        addMessages("config/" + adviseVersion + "/advisorMessages", advisorMethodBeanList, "message");
-        addMessages("config/" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
+        addMessages("config/jakarta" + adviseVersion + "/advisorMessages", advisorMethodBeanList, "message");
+        addMessages("config/jakarta" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
     }
 
     public void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
