@@ -148,16 +148,45 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<AdvisorBean> advisorsList = new ArrayList<>();
         AdvisorInterface[] advisorInterfaces = new AdvisorInterface[]{new AdvisorMethodCall(), new AdvisorClassImport()};
         for (File sourceFile : files) {
-            patterns.forEach((key, value) -> {
-                for (AdvisorInterface advisorInterface : advisorInterfaces) {
+            patterns.forEach((k, v) -> {
+                String value = (String) v;
+                if (value.contains("#")) {
+                    String importNameSpace = value.substring(0, value.indexOf("#"));
+                    String methodCall = value.substring(value.indexOf("#") + 1, value.length());
+                    //search import
                     AdvisorBean advisorBean = null;
+                    AdvisorClassImport acimp = new AdvisorClassImport();
                     try {
-                        advisorBean = advisorInterface.parseFile((String) key, (String) value, sourceFile);
+                        advisorBean = acimp.parseFile((String) k, importNameSpace, sourceFile);
+                        //check if method call
+                        if(advisorBean != null) {
+                            AdvisorMethodCall amc = new AdvisorMethodCall();
+                            advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            if (advisorBean != null) {
+                                advisorsList.add(advisorBean);
+                            } else {
+                                //check if method declaration
+                                AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
+                                advisorBean = amd.parseFile((String)k, methodCall, sourceFile);
+                                if(advisorBean != null) {
+                                    advisorsList.add(advisorBean);
+                                }
+                            }
+                        }
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
-                    if (advisorBean != null) {
-                        advisorsList.add(advisorBean);
+                } else {
+                    for (AdvisorInterface advisorInterface : advisorInterfaces) {
+                        AdvisorBean advisorBean = null;
+                        try {
+                            advisorBean = advisorInterface.parseFile((String) k, (String) v, sourceFile);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (advisorBean != null) {
+                            advisorsList.add(advisorBean);
+                        }
                     }
                 }
             });
@@ -175,8 +204,6 @@ public class AdvisorToolMojo extends AbstractMojo {
             URI baseMessageFolder = null;
             try {
                 baseMessageFolder = AdvisorToolMojo.class.getClassLoader().getResource(url).toURI();
-
-                Properties messageProperties = new Properties();
                 Path internalPath = null;
                 if (baseMessageFolder.getScheme().equals("jar")) {
                     FileSystem fileSystem = FileSystems.getFileSystem(baseMessageFolder);
@@ -204,7 +231,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             }
             
             if(type.equals("fix")) {
-                fileFix = spec + "fix-message.properties";
+                fileFix = spec + "fix-messages.properties";
             }
             
         } else if (keyPattern.contains("remove")) {
@@ -213,7 +240,7 @@ public class AdvisorToolMojo extends AbstractMojo {
                 fileMessageName = spec + "messages.properties";
             }
             if(type.equals("fix")) {
-                fileFix = spec + "fix-message.properties";
+                fileFix = spec + "fix-messages.properties";
             }
         }
 
