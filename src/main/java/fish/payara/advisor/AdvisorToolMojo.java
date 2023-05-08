@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -63,7 +64,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-@Mojo(name = "advisorTool", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "advise", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
 
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
@@ -72,20 +73,20 @@ public class AdvisorToolMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "")
+    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
 
 
     @Override
     public void execute() {
         Properties patterns = null;
-        List<AdvisorBean> advisorBeans = null;
+        List<AdvisorBean> advisorBeans = Collections.emptyList();
         Properties properties = System.getProperties();
-        this.adviseVersion = properties.getProperty(ADVISE_VERSION);
+        if(properties.getProperty(ADVISE_VERSION) != null) {
+            this.adviseVersion = properties.getProperty(ADVISE_VERSION);
+        }
         try {
-            //check if advise-version parameter was set
             if(adviseVersion != null && !adviseVersion.isEmpty()) {
-                //loadPatterns
                 patterns = loadPatterns(adviseVersion);
             } else {
                 log.severe("You need to indicate adviseVersion option");
@@ -100,37 +101,33 @@ public class AdvisorToolMojo extends AbstractMojo {
             //print messages
             addMessages(advisorBeans);
             printToConsole(advisorBeans);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public Properties loadPatterns(String version) throws URISyntaxException, IOException {
         //validate configurations
-        URI uriVersion = AdvisorToolMojo.class.getClassLoader().getResource("config/"+version).toURI();
-        if(uriVersion == null) {
+        if(AdvisorToolMojo.class.getClassLoader().getResource("config/jakarta"+version) == null) {
             log.severe(String.format("Not available configurations for the indicated version %s", version));
             return null;
         }
-        URI uriBaseFolder = AdvisorToolMojo.class.getClassLoader().getResource("config/"+version+"/mappedPatterns").toURI();
+        URI uriBaseFolder = Objects.requireNonNull(AdvisorToolMojo.class.getClassLoader().getResource(
+                "config/jakarta" + version + "/mappedPatterns")).toURI();
         Properties readPatterns = new Properties();
         Path internalPath = null;
         if(uriBaseFolder.getScheme().equals("jar")) {
             FileSystem fileSystem = FileSystems.newFileSystem(uriBaseFolder, Collections.<String, Object>emptyMap());
-            internalPath = fileSystem.getPath("config/"+version+"/mappedPatterns");
+            internalPath = fileSystem.getPath("config/jakarta"+version+"/mappedPatterns");
         } else {
             internalPath = Paths.get(uriBaseFolder);
         }
-        if(internalPath != null) {
-            Stream<Path> walk = Files.walk(internalPath, 1);
-            for (Iterator<Path> it = walk.iterator(); it.hasNext();){
-                Path p = it.next();
-                if(p.getFileName().toString().contains(".properties")) {
-                    getLog().info("Read file Stream:"+p.toString());
-                    readPatterns.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
-                }
+        Stream<Path> walk = Files.walk(internalPath, 1);
+        for (Iterator<Path> it = walk.iterator(); it.hasNext();){
+            Path p = it.next();
+            if(p.getFileName().toString().contains(".properties")) {
+                getLog().info("Read file Stream:"+p.toString());
+                readPatterns.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
             }
         }
         return readPatterns;
@@ -141,25 +138,56 @@ public class AdvisorToolMojo extends AbstractMojo {
         if(project.getBasedir() != null) {
             availableFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
                     .filter(Files::isRegularFile).filter( p -> p.toString().contains(".java"))
-                    .map(f -> f.toFile())
+                    .map(Path::toFile)
                     .collect(Collectors.toList());
         }
         return availableFiles;
     }
-    
+
     public List<AdvisorBean> inspectCode(Properties patterns, List<File> files) throws IOException {
         List<AdvisorBean> advisorsList = new ArrayList<>();
-        AdvisorMethodCall advisorMethodCall = new AdvisorMethodCall();
-        for (File sourceFile: files) {
-            patterns.forEach((key, value) -> {
-                AdvisorBean advisorMethodBean = null;
-                try {
-                    advisorMethodBean = advisorMethodCall.parseFile((String)key, (String)value, sourceFile);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-                if(advisorMethodBean != null) {
-                    advisorsList.add(advisorMethodBean);
+        AdvisorInterface[] advisorInterfaces = new AdvisorInterface[]{new AdvisorMethodCall(), new AdvisorClassImport()};
+        for (File sourceFile : files) {
+            patterns.forEach((k, v) -> {
+                String value = (String) v;
+                if (value.contains("#")) {
+                    String importNameSpace = value.substring(0, value.indexOf("#"));
+                    String methodCall = value.substring(value.indexOf("#") + 1, value.length());
+                    //search import
+                    AdvisorBean advisorBean = null;
+                    AdvisorClassImport acimp = new AdvisorClassImport();
+                    try {
+                        advisorBean = acimp.parseFile((String) k, importNameSpace, sourceFile);
+                        //check if method call
+                        if(advisorBean != null) {
+                            AdvisorMethodCall amc = new AdvisorMethodCall();
+                            advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            if (advisorBean != null) {
+                                advisorsList.add(advisorBean);
+                            } else {
+                                //check if method declaration
+                                AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
+                                advisorBean = amd.parseFile((String)k, methodCall, sourceFile);
+                                if(advisorBean != null) {
+                                    advisorsList.add(advisorBean);
+                                }
+                            }
+                        }
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    for (AdvisorInterface advisorInterface : advisorInterfaces) {
+                        AdvisorBean advisorBean = null;
+                        try {
+                            advisorBean = advisorInterface.parseFile((String) k, (String) v, sourceFile);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if (advisorBean != null) {
+                            advisorsList.add(advisorBean);
+                        }
+                    }
                 }
             });
         }
@@ -167,8 +195,8 @@ public class AdvisorToolMojo extends AbstractMojo {
     }
     
     public void addMessages(List<AdvisorBean> advisorMethodBeanList) {
-        addMessages("config/" + adviseVersion + "/advisorMessages", advisorMethodBeanList, "message");
-        addMessages("config/" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
+        addMessages("config/jakarta" + adviseVersion + "/advisorMessages", advisorMethodBeanList, "message");
+        addMessages("config/jakarta" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
     }
 
     public void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
@@ -176,8 +204,6 @@ public class AdvisorToolMojo extends AbstractMojo {
             URI baseMessageFolder = null;
             try {
                 baseMessageFolder = AdvisorToolMojo.class.getClassLoader().getResource(url).toURI();
-
-                Properties messageProperties = new Properties();
                 Path internalPath = null;
                 if (baseMessageFolder.getScheme().equals("jar")) {
                     FileSystem fileSystem = FileSystems.getFileSystem(baseMessageFolder);
@@ -186,9 +212,7 @@ public class AdvisorToolMojo extends AbstractMojo {
                     internalPath = Paths.get(baseMessageFolder);
                 }
                 findMessage(internalPath, b.getKeyPattern(), type, b);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+            } catch (URISyntaxException | IOException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -207,7 +231,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             }
             
             if(type.equals("fix")) {
-                fileFix = spec + "fix-message.properties";
+                fileFix = spec + "fix-messages.properties";
             }
             
         } else if (keyPattern.contains("remove")) {
@@ -216,7 +240,7 @@ public class AdvisorToolMojo extends AbstractMojo {
                 fileMessageName = spec + "messages.properties";
             }
             if(type.equals("fix")) {
-                fileFix = spec + "fix-message.properties";
+                fileFix = spec + "fix-messages.properties";
             }
         }
 
@@ -228,11 +252,12 @@ public class AdvisorToolMojo extends AbstractMojo {
             Stream<Path> walk = Files.walk(internalPath, 1);
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
                 Path p = it.next();
-                if (type.equals("message") && p.getFileName().toString().contains((String) fileMessageName)) {
+                if (type.equals("message") && fileMessageName != null &&
+                        p.getFileName().toString().contains(fileMessageName)) {
                     messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
 
-                if (type.equals("fix") && p.getFileName().toString().contains((String) fileFix)) {
+                if (type.equals("fix") && fileFix != null && p.getFileName().toString().contains(fileFix)) {
                     messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
                 
@@ -246,12 +271,14 @@ public class AdvisorToolMojo extends AbstractMojo {
         }
         
         if(type.equals("message")) {
-            String message = messageProperties.getProperty(keyIssue);
+            String message = keyIssue != null ?
+                    messageProperties.getProperty(keyIssue) : messageProperties.getProperty(keyPattern);
             advisorMessage.setMessage(message);
         }
         
         if(type.equals("fix")) {
-            String fix = messageProperties.getProperty(keyIssue);
+            String fix = keyIssue != null ?
+                    messageProperties.getProperty(keyIssue) : messageProperties.getProperty(keyPattern);
             advisorMessage.setFix(fix);
         }
         
