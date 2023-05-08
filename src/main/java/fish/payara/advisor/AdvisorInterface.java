@@ -51,11 +51,11 @@ import java.util.List;
 
 public interface AdvisorInterface {
 
-    VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern);
+    VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params);
 
-    default AdvisorBean parseFile(String keyPattern, String valuePattern, File f) throws FileNotFoundException {
+    default AdvisorBean parseFile(String keyPattern, String valuePattern, File f, String... params) throws FileNotFoundException {
         List<AdvisorBean> advisorBeanList = new ArrayList<>();
-        VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern);
+        VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, params);
         CompilationUnit compilationUnit = StaticJavaParser.parse(f);
         collector.visit(compilationUnit, advisorBeanList);
         if (advisorBeanList.size() > 0) {

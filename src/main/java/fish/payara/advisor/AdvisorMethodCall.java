@@ -40,7 +40,13 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
@@ -50,18 +56,20 @@ import java.util.Optional;
 public class AdvisorMethodCall implements AdvisorInterface {
 
     @Override
-    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
-        return new MethodCallCollector(keyPattern, valuePattern);
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
+        return new MethodCallCollector(keyPattern, valuePattern, params);
     }
 
     private static class MethodCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
-        
+
         private final String keyPattern;
         private final String valuePattern;
-        
-        public MethodCallCollector(String keyPattern, String valuePattern) {
+        private final String[] params;
+
+        public MethodCallCollector(String keyPattern, String valuePattern, String... params) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
+            this.params = params;
         }
 
         public void visit(MethodCallExpr methodCall, List<AdvisorBean> collector) {
@@ -73,8 +81,31 @@ public class AdvisorMethodCall implements AdvisorInterface {
                         setLine((p.map(position -> "" + position.line).orElse(""))).
                         setMethodDeclaration(methodCall.asMethodCallExpr().toString()).build();
                 collector.add(advisorMethodBean);
+            } else if (valuePattern.contains("(") && valuePattern.contains(")") &&
+                    methodCall.toString().contains(valuePattern.substring(0, valuePattern.indexOf('('))) &&
+                    isSameArgumentTypes(params, methodCall.getArguments())) {
+                AdvisorBean advisorMethodBean = new AdvisorBean.
+                        AdvisorBeanBuilder(keyPattern, valuePattern).
+                        setLine((p.map(position -> "" + position.line).orElse(""))).
+                        setMethodDeclaration(methodCall.asMethodCallExpr().toString()).build();
+                collector.add(advisorMethodBean);
             }
         }
+
+        private boolean isSameArgumentTypes(String[] params, NodeList<Expression> nodeList) {
+            if (nodeList.size() != params.length) {
+                return false;
+            }
+            for (int i = 0; i < nodeList.size(); i++) {
+                Expression argument = nodeList.get(i);
+                if (argument instanceof ObjectCreationExpr) {
+                    ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
+                    if (!type.getName().asString().equals(params[i])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
-    
 }

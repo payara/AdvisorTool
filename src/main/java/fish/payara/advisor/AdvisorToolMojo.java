@@ -159,16 +159,25 @@ public class AdvisorToolMojo extends AbstractMojo {
                     try {
                         advisorBean = acimp.parseFile((String) k, importNameSpace, sourceFile);
                         //check if method call
-                        if(advisorBean != null) {
+                        if (advisorBean != null) {
                             AdvisorMethodCall amc = new AdvisorMethodCall();
-                            advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            if (methodCall.contains("(") && methodCall.contains(")")) {
+                                String args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
+                                if (args.indexOf(',') > -1) {
+                                    advisorBean = amc.parseFile((String) k, methodCall, sourceFile, args.split(","));
+                                } else {
+                                    advisorBean = amc.parseFile((String) k, methodCall, sourceFile, args);
+                                }
+                            } else {
+                                advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            }
                             if (advisorBean != null) {
                                 advisorsList.add(advisorBean);
                             } else {
                                 //check if method declaration
                                 AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
-                                advisorBean = amd.parseFile((String)k, methodCall, sourceFile);
-                                if(advisorBean != null) {
+                                advisorBean = amd.parseFile((String) k, methodCall, sourceFile);
+                                if (advisorBean != null) {
                                     advisorsList.add(advisorBean);
                                 }
                             }
