@@ -122,7 +122,7 @@ public class AdvisorBean {
     @Override
     public String toString() {
         return "Line of code: " + line + " | Expression: " + getExpression() +"\n"+
-                "Source file: "+file.getName() + "\n"+
+                "Source file: " + file.getName() + "\n"+
                 advisorMessage.toString();
     }
 
