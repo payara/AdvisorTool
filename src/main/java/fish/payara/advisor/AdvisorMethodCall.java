@@ -52,6 +52,9 @@ public class AdvisorMethodCall implements AdvisorInterface {
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
         return new MethodCallCollector(keyPattern, valuePattern);
+    }@Override
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern) {
+        return null;
     }
 
     private static class MethodCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {

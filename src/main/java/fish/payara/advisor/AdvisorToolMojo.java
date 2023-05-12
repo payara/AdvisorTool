@@ -151,31 +151,9 @@ public class AdvisorToolMojo extends AbstractMojo {
             patterns.forEach((k, v) -> {
                 String value = (String) v;
                 if (value.contains("#")) {
-                    String importNameSpace = value.substring(0, value.indexOf("#"));
-                    String methodCall = value.substring(value.indexOf("#") + 1, value.length());
-                    //search import
-                    AdvisorBean advisorBean = null;
-                    AdvisorClassImport acimp = new AdvisorClassImport();
-                    try {
-                        advisorBean = acimp.parseFile((String) k, importNameSpace, sourceFile);
-                        //check if method call
-                        if(advisorBean != null) {
-                            AdvisorMethodCall amc = new AdvisorMethodCall();
-                            advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
-                            if (advisorBean != null) {
-                                advisorsList.add(advisorBean);
-                            } else {
-                                //check if method declaration
-                                AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
-                                advisorBean = amd.parseFile((String)k, methodCall, sourceFile);
-                                if(advisorBean != null) {
-                                    advisorsList.add(advisorBean);
-                                }
-                            }
-                        }
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
+                    processMethodCall(value, (String) k, sourceFile, advisorsList);
+                } else if(value.contains("@")) {
+                    processAnnotation(value, (String) k, sourceFile, advisorsList);
                 } else {
                     for (AdvisorInterface advisorInterface : advisorInterfaces) {
                         AdvisorBean advisorBean = null;
@@ -192,6 +170,55 @@ public class AdvisorToolMojo extends AbstractMojo {
             });
         }
         return advisorsList;
+    }
+    
+    public void processMethodCall(String value, String key, File sourceFile, List<AdvisorBean> advisorsList) {
+        String importNameSpace = value.substring(0, value.indexOf("#"));
+        String methodCall = value.substring(value.indexOf("#") + 1, value.length());
+        //search import
+        AdvisorBean advisorBean = null;
+        AdvisorClassImport acimp = new AdvisorClassImport();
+        try {
+            advisorBean = acimp.parseFile((String) key, importNameSpace, sourceFile);
+            //check if method call
+            if(advisorBean != null) {
+                AdvisorMethodCall amc = new AdvisorMethodCall();
+                advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
+                if (advisorBean != null) {
+                    advisorsList.add(advisorBean);
+                } else {
+                    //check if method declaration
+                    AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
+                    advisorBean = amd.parseFile((String)key, methodCall, sourceFile);
+                    if(advisorBean != null) {
+                        advisorsList.add(advisorBean);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void processAnnotation(String value, String key, File sourceFile, List<AdvisorBean> advisorsList) {
+        String importAnnotationNameSpace = value.substring(0, value.indexOf("@"));
+        String annotationPropertyDeclaration = value.substring(value.indexOf("@") + 1, value.length());
+        //search import
+        AdvisorBean advisorBean = null;
+        AdvisorClassImport acimp = new AdvisorClassImport();
+        try {
+            advisorBean = acimp.parseFile((String) key, importAnnotationNameSpace, sourceFile);
+            //check if annotation with property
+            if (advisorBean != null) {
+                AdvisorAnnotationWithProperty aacwp = new AdvisorAnnotationWithProperty();
+                advisorBean = aacwp.parseFile((String) key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
+                if(advisorBean != null) {
+                    advisorsList.add(advisorBean);
+                }
+            }
+        } catch(FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     public void addMessages(List<AdvisorBean> advisorMethodBeanList) {
@@ -246,6 +273,8 @@ public class AdvisorToolMojo extends AbstractMojo {
 
         if (spec != null && keyPattern.contains("issue")) {
             keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"), keyPattern.length());
+        } else if(spec != null && keyPattern.contains("method-change")) {
+            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("method-change") + 14, keyPattern.length());
         }
 
         if (internalPath != null) {

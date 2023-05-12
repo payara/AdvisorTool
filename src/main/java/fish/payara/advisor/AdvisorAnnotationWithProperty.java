@@ -40,44 +40,62 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
-import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AdvisorClassImport implements AdvisorInterface {
-
+public class AdvisorAnnotationWithProperty implements AdvisorInterface {
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
-        return new AdvisorClassImport.ClassImportCollector(keyPattern, valuePattern);
+        return null;
     }
 
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern) {
-        return null;
+        return new AdvisorAnnotationWithProperty.AnnotationWithPropertyCollector(keyPattern, valuePattern, secondPattern);
     }
 
-    private static class ClassImportCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
-        
+
+    private static class AnnotationWithPropertyCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         private final String keyPattern;
         private final String valuePattern;
         
-        public ClassImportCollector(String keyPattern, String valuePattern) {
+        private final String secondPattern;
+        
+        public AnnotationWithPropertyCollector(String keyPattern, String valuePattern, String secondPattern) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
+            this.secondPattern = secondPattern;
         }
-
-        public void visit(final ImportDeclaration importDeclaration, final List<AdvisorBean> collector) {
-            super.visit(importDeclaration, collector);
-            Optional<Position> p = importDeclaration.getBegin();
-            if (importDeclaration.toString().contains(valuePattern)) {
-                AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern)
-                        .setLine((p.map(position -> "" + position.line).orElse("")))
-                                .setImportDeclaration(importDeclaration.getNameAsString()).build();
-                collector.add(advisorBean);
+        
+        public void visit(final NormalAnnotationExpr annotationDeclaration, List<AdvisorBean> collector) {
+            super.visit(annotationDeclaration, collector);
+            Optional<Position> p = annotationDeclaration.getBegin();
+            String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
+            if(annotationDeclaration.toString().contains(annotationName) && annotationDeclaration.toString().contains(secondPattern)) {
+                    AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName +"@"+secondPattern)
+                            .setLine((p.map(position -> "" + position.line).orElse(""))).build();
+                    collector.add(advisorBean);
             }
+            
         }
+    }
+
+    public AdvisorBean parseFile(String keyPattern, String valuePattern, String secondPattern, File f) throws FileNotFoundException {
+        List<AdvisorBean> advisorBeanList = new ArrayList<>();
+        VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, secondPattern);
+        collector.visit(StaticJavaParser.parse(f), advisorBeanList);
+        if (advisorBeanList.size() > 0) {
+            AdvisorBean b = advisorBeanList.get(0);
+            b.setFile(f);
+            return b;
+        }
+        return null;
     }
 }
