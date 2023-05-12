@@ -80,7 +80,8 @@ public class AdvisorAnnotationWithProperty implements AdvisorInterface {
             String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
             if(annotationDeclaration.toString().contains(annotationName) && annotationDeclaration.toString().contains(secondPattern)) {
                     AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName +"@"+secondPattern)
-                            .setLine((p.map(position -> "" + position.line).orElse(""))).build();
+                            .setLine((p.map(position -> "" + position.line).orElse("")))
+                            .setAnnotationDeclaration(annotationDeclaration.toString()).build();
                     collector.add(advisorBean);
             }
             

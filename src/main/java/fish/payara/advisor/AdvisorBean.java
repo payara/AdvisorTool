@@ -46,6 +46,8 @@ public class AdvisorBean {
     private File file;
     private String methodDeclaration;
     private String importDeclaration;
+    
+    private String annotationDeclaration;
     private String line;
 
     private String keyPattern;
@@ -61,6 +63,7 @@ public class AdvisorBean {
         this.keyPattern = advisorBeanBuilder.keyPattern;
         this.valuePattern = advisorBeanBuilder.valuePattern;
         this.advisorMessage = advisorBeanBuilder.advisorMessage;
+        this.annotationDeclaration = advisorBeanBuilder.annotationDeclaration;
     }
 
     public File getFile() {
@@ -119,6 +122,14 @@ public class AdvisorBean {
         this.advisorMessage = advisorMessage;
     }
 
+    public String getAnnotationDeclaration() {
+        return annotationDeclaration;
+    }
+
+    public void setAnnotationDeclaration(String annotationDeclaration) {
+        this.annotationDeclaration = annotationDeclaration;
+    }
+
     @Override
     public String toString() {
         return "Line of code: " + line + " | Expression: " + getExpression() +"\n"+
@@ -130,6 +141,10 @@ public class AdvisorBean {
         if (methodDeclaration != null) {
             return methodDeclaration;
         }
+        
+        if(annotationDeclaration != null) {
+            return annotationDeclaration;
+        }
 
         return Objects.requireNonNullElse(importDeclaration, "");
     }
@@ -138,6 +153,8 @@ public class AdvisorBean {
         private File file;
         private String methodDeclaration;
         private String importDeclaration;
+        
+        private String annotationDeclaration;
         private String line;
 
         final private String keyPattern;
@@ -172,6 +189,11 @@ public class AdvisorBean {
         
         public AdvisorBeanBuilder setAdvisorMessage(AdvisorMessage advisorMessage) {
             this.advisorMessage = advisorMessage;
+            return this;
+        }
+        
+        public AdvisorBeanBuilder setAnnotationDeclaration(String annotationDeclaration) {
+            this.annotationDeclaration = annotationDeclaration;
             return this;
         }
         
