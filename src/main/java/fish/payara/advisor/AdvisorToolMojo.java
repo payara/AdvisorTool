@@ -219,7 +219,17 @@ public class AdvisorToolMojo extends AbstractMojo {
             //check if method call
             if(advisorBean != null) {
                 AdvisorMethodCall amc = new AdvisorMethodCall();
-                advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
+                if (methodCall.contains("(") && methodCall.contains(")")) {
+                    String args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
+                    if (args.indexOf(',') > -1) {
+                        advisorBean = amc.parseFile((String) key, methodCall, sourceFile, args.split(","));
+                    } else {
+                        advisorBean = amc.parseFile((String) key, methodCall, sourceFile, args);
+                    }
+                } else {
+                    advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
+                }
+                //advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
                 if (advisorBean != null) {
                     advisorsList.add(advisorBean);
                 } else {
@@ -296,8 +306,11 @@ public class AdvisorToolMojo extends AbstractMojo {
         if(type.equals("fix")) {
             fileFix = spec + "fix-messages.properties";
         }
+        
         if (keyPattern.contains("issue")) {
             keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"));
+        } else if(keyPattern.contains("method-change")) {
+            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("method-change") + 14, keyPattern.length());
         }
 
         if (internalPath != null) {

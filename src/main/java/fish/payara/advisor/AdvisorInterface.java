@@ -51,6 +51,8 @@ public interface AdvisorInterface {
 
     VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params);
 
+    VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern);
+
     default AdvisorBean parseFile(String keyPattern, String valuePattern, File f, String... params) throws FileNotFoundException {
         List<AdvisorBean> advisorBeanList = new ArrayList<>();
         VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, params);

@@ -51,8 +51,9 @@ import java.util.List;
 import java.util.Optional;
 
 public class AdvisorAnnotationWithProperty implements AdvisorInterface {
+    
     @Override
-    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
         return null;
     }
 
