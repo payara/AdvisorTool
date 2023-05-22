@@ -39,6 +39,13 @@
  */
 package fish.payara.advisor;
 
+import fish.payara.advisor.config.files.BeansXml;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,11 +65,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 
 @Mojo(name = "advise", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
@@ -94,15 +96,40 @@ public class AdvisorToolMojo extends AbstractMojo {
             }
             //readSourceFiles
             List<File> files = readSourceFiles();
-            if (patterns != null && !patterns.isEmpty() && !files.isEmpty()) {
-                //searchPatterns
-                advisorBeans = inspectCode(patterns, files);
+            if (!files.isEmpty()) {
+                if (patterns != null && !patterns.isEmpty()) {
+                    //searchPatterns
+                    advisorBeans = inspectCode(patterns, files);
+
+                }
+                this.checkConfigFiles(advisorBeans, files);
             }
             //print messages
             addMessages(advisorBeans);
             printToConsole(advisorBeans);
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void checkConfigFiles(List<AdvisorBean> advisorBeans, List<File> files) {
+        Analyzer<List<AdvisorBean>> beanAnalyzer = new BeansXml();
+
+        boolean beanXmlNotFound = true;
+        for (File file : files) {
+            if (file.isFile() && "beans.xml".equals(file.getName())) {
+                beanXmlNotFound = false;
+                List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                if (advisorsFromAnalyzer.size() > 0) {
+                    advisorBeans.addAll(advisorsFromAnalyzer);
+                }
+            }
+        }
+        if (beanXmlNotFound) {
+            AdvisorBean advisorFileBean = new AdvisorBean.
+                    AdvisorBeanBuilder("jakarta-cdi-file-not-found-beans-xml", "not.found.beans.xml").
+                    setMethodDeclaration("not found beans.xml").build();
+            advisorBeans.add(advisorFileBean);
         }
     }
 
@@ -137,7 +164,8 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<File> availableFiles = new ArrayList<>();
         if(project.getBasedir() != null) {
             availableFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
-                    .filter(Files::isRegularFile).filter( p -> p.toString().contains(".java"))
+                    .filter(Files::isRegularFile).filter(
+                            p -> p.toString().endsWith(".java") || p.toString().endsWith(".xml"))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
@@ -148,6 +176,9 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<AdvisorBean> advisorsList = new ArrayList<>();
         AdvisorInterface[] advisorInterfaces = new AdvisorInterface[]{new AdvisorMethodCall(), new AdvisorClassImport()};
         for (File sourceFile : files) {
+            if (sourceFile.getName().endsWith(".xml")) {
+                continue;
+            }
             patterns.forEach((k, v) -> {
                 String value = (String) v;
                 if (value.contains("#")) {
@@ -159,16 +190,25 @@ public class AdvisorToolMojo extends AbstractMojo {
                     try {
                         advisorBean = acimp.parseFile((String) k, importNameSpace, sourceFile);
                         //check if method call
-                        if(advisorBean != null) {
+                        if (advisorBean != null) {
                             AdvisorMethodCall amc = new AdvisorMethodCall();
-                            advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            if (methodCall.contains("(") && methodCall.contains(")")) {
+                                String args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
+                                if (args.indexOf(',') > -1) {
+                                    advisorBean = amc.parseFile((String) k, methodCall, sourceFile, args.split(","));
+                                } else {
+                                    advisorBean = amc.parseFile((String) k, methodCall, sourceFile, args);
+                                }
+                            } else {
+                                advisorBean = amc.parseFile((String) k, methodCall, sourceFile);
+                            }
                             if (advisorBean != null) {
                                 advisorsList.add(advisorBean);
                             } else {
                                 //check if method declaration
                                 AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
-                                advisorBean = amd.parseFile((String)k, methodCall, sourceFile);
-                                if(advisorBean != null) {
+                                advisorBean = amd.parseFile((String) k, methodCall, sourceFile);
+                                if (advisorBean != null) {
                                     advisorsList.add(advisorBean);
                                 }
                             }
@@ -221,46 +261,33 @@ public class AdvisorToolMojo extends AbstractMojo {
     public void findMessage(Path internalPath, String keyPattern, String type, AdvisorBean b) throws IOException {
         String fileMessageName = null;
         String fileFix = null;
-        String spec = null;
         String keyIssue = null;
         Properties messageProperties = new Properties();
-        if (keyPattern.contains("method")) {
-            spec = keyPattern.substring(0, keyPattern.indexOf("method"));
-            if(type.equals("message")) {
-                fileMessageName = spec + "messages.properties";
-            }
-            
-            if(type.equals("fix")) {
-                fileFix = spec + "fix-messages.properties";
-            }
-            
-        } else if (keyPattern.contains("remove")) {
-            spec = keyPattern.substring(0, keyPattern.indexOf("remove"));
-            if(type.equals("message")) {
-                fileMessageName = spec + "messages.properties";
-            }
-            if(type.equals("fix")) {
-                fileFix = spec + "fix-messages.properties";
-            }
+        String subSpec = keyPattern.contains("method") ? "method" : (
+            keyPattern.contains("remove") ? "remove" : "file"
+        );
+        String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
+        if(type.equals("message")) {
+            fileMessageName = spec + "messages.properties";
         }
-
-        if (spec != null && keyPattern.contains("issue")) {
-            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"), keyPattern.length());
+        if(type.equals("fix")) {
+            fileFix = spec + "fix-messages.properties";
+        }
+        if (keyPattern.contains("issue")) {
+            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"));
         }
 
         if (internalPath != null) {
             Stream<Path> walk = Files.walk(internalPath, 1);
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
                 Path p = it.next();
-                if (type.equals("message") && fileMessageName != null &&
+                if (type.equals("message") &&
                         p.getFileName().toString().contains(fileMessageName)) {
                     messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
-
-                if (type.equals("fix") && fileFix != null && p.getFileName().toString().contains(fileFix)) {
+                if (type.equals("fix") && p.getFileName().toString().contains(fileFix)) {
                     messageProperties.load(AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString()));
                 }
-                
             }
         }
         AdvisorMessage advisorMessage = null;
