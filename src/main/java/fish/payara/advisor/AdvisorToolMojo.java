@@ -115,13 +115,21 @@ public class AdvisorToolMojo extends AbstractMojo {
     private void checkConfigFiles(List<AdvisorBean> advisorBeans, List<File> files) {
         Analyzer<List<AdvisorBean>> beanAnalyzer = new BeansXml();
 
+        boolean beanXmlNotFound = true;
         for (File file : files) {
             if (file.isFile() && "beans.xml".equals(file.getName())) {
-                List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analize(file);
+                beanXmlNotFound = false;
+                List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
                 if (advisorsFromAnalyzer.size() > 0) {
                     advisorBeans.addAll(advisorsFromAnalyzer);
                 }
             }
+        }
+        if (beanXmlNotFound) {
+            AdvisorBean advisorFileBean = new AdvisorBean.
+                    AdvisorBeanBuilder("jakarta-cdi-file-not-found-beans-xml", "not.found.beans.xml").
+                    setMethodDeclaration("not found beans.xml").build();
+            advisorBeans.add(advisorFileBean);
         }
     }
 

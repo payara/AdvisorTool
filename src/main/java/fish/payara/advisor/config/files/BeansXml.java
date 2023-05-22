@@ -58,7 +58,7 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
     public BeansXml() {
     }
 
-    public List<AdvisorBean> analize(File file) {
+    public List<AdvisorBean> analise(File file) {
         List<AdvisorBean> advisors = new ArrayList<>();
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser saxParser = null;

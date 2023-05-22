@@ -44,5 +44,5 @@ import java.io.File;
 import java.util.List;
 
 public interface Analyzer<T extends List<AdvisorBean>> {
-    T analize(File var1);
+    T analise(File var1);
 }
