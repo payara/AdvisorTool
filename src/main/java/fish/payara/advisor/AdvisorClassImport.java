@@ -50,7 +50,7 @@ import java.util.Optional;
 public class AdvisorClassImport implements AdvisorInterface {
 
     @Override
-    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
         return new AdvisorClassImport.ClassImportCollector(keyPattern, valuePattern);
     }
 

@@ -40,7 +40,10 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
@@ -48,7 +51,7 @@ import java.util.Optional;
 
 public class AdvisorMethodDeclaration implements AdvisorInterface {
     @Override
-    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern) {
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
         return new MethodDeclarationCollector(keyPattern, valuePattern);
     }
 
@@ -60,7 +63,7 @@ public class AdvisorMethodDeclaration implements AdvisorInterface {
     private static class MethodDeclarationCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         private final String keyPattern;
         private final String valuePattern;
-        
+
         public MethodDeclarationCollector(String keyPattern, String valuePattern) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;

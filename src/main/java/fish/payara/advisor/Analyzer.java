@@ -37,30 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 package fish.payara.advisor;
 
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.visitor.VoidVisitor;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 
-public interface AdvisorInterface {
-
-    VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params);
-
-    default AdvisorBean parseFile(String keyPattern, String valuePattern, File f, String... params) throws FileNotFoundException {
-        List<AdvisorBean> advisorBeanList = new ArrayList<>();
-        VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, params);
-        CompilationUnit compilationUnit = StaticJavaParser.parse(f);
-        collector.visit(compilationUnit, advisorBeanList);
-        if (advisorBeanList.size() > 0) {
-            AdvisorBean b = advisorBeanList.get(0);
-            b.setFile(f);
-            return b;
-        }
-        return null;
-    }
+public interface Analyzer<T extends List<AdvisorBean>> {
+    T analise(File var1);
 }
