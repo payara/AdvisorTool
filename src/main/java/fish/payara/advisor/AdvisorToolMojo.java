@@ -309,8 +309,6 @@ public class AdvisorToolMojo extends AbstractMojo {
         
         if (keyPattern.contains("issue")) {
             keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"));
-        } else if(keyPattern.contains("method-change")) {
-            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("method-change") + 14, keyPattern.length());
         }
 
         if (internalPath != null) {
