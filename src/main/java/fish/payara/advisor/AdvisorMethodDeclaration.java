@@ -55,6 +55,11 @@ public class AdvisorMethodDeclaration implements AdvisorInterface {
         return new MethodDeclarationCollector(keyPattern, valuePattern);
     }
 
+    @Override
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern) {
+        return null;
+    }
+
     private static class MethodDeclarationCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         private final String keyPattern;
         private final String valuePattern;

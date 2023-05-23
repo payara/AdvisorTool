@@ -54,6 +54,11 @@ public class AdvisorClassImport implements AdvisorInterface {
         return new AdvisorClassImport.ClassImportCollector(keyPattern, valuePattern);
     }
 
+    @Override
+    public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern) {
+        return null;
+    }
+
     private static class ClassImportCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         
         private final String keyPattern;

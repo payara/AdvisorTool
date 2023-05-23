@@ -40,76 +40,64 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AdvisorMethodCall implements AdvisorInterface {
-
+public class AdvisorAnnotationWithProperty implements AdvisorInterface {
+    
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
-        return new MethodCallCollector(keyPattern, valuePattern, params);
+        return null;
     }
 
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern) {
-        return null;
+        return new AdvisorAnnotationWithProperty.AnnotationWithPropertyCollector(keyPattern, valuePattern, secondPattern);
     }
 
 
-    private static class MethodCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
-
+    private static class AnnotationWithPropertyCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         private final String keyPattern;
         private final String valuePattern;
-        private final String[] params;
-
-        public MethodCallCollector(String keyPattern, String valuePattern, String... params) {
+        
+        private final String secondPattern;
+        
+        public AnnotationWithPropertyCollector(String keyPattern, String valuePattern, String secondPattern) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
-            this.params = params;
+            this.secondPattern = secondPattern;
         }
+        
+        public void visit(final NormalAnnotationExpr annotationDeclaration, List<AdvisorBean> collector) {
+            super.visit(annotationDeclaration, collector);
+            Optional<Position> p = annotationDeclaration.getBegin();
+            String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
+            if(annotationDeclaration.toString().contains(annotationName) && annotationDeclaration.toString().contains(secondPattern)) {
+                    AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName +"@"+secondPattern)
+                            .setLine((p.map(position -> "" + position.line).orElse("")))
+                            .setAnnotationDeclaration(annotationDeclaration.toString()).build();
+                    collector.add(advisorBean);
+            }
+            
+        }
+    }
 
-        public void visit(MethodCallExpr methodCall, List<AdvisorBean> collector) {
-            super.visit(methodCall, collector);
-            Optional<Position> p = methodCall.getBegin();
-            if (methodCall.toString().contains(valuePattern)) {
-                AdvisorBean advisorMethodBean = new AdvisorBean.
-                        AdvisorBeanBuilder(keyPattern, valuePattern).
-                        setLine((p.map(position -> "" + position.line).orElse(""))).
-                        setMethodDeclaration(methodCall.asMethodCallExpr().toString()).build();
-                collector.add(advisorMethodBean);
-            } else if (valuePattern.contains("(") && valuePattern.contains(")") &&
-                    methodCall.toString().contains(valuePattern.substring(0, valuePattern.indexOf('('))) &&
-                    isSameArgumentTypes(params, methodCall.getArguments())) {
-                AdvisorBean advisorMethodBean = new AdvisorBean.
-                        AdvisorBeanBuilder(keyPattern, valuePattern).
-                        setLine((p.map(position -> "" + position.line).orElse(""))).
-                        setMethodDeclaration(methodCall.asMethodCallExpr().toString()).build();
-                collector.add(advisorMethodBean);
-            }
+    public AdvisorBean parseFile(String keyPattern, String valuePattern, String secondPattern, File f) throws FileNotFoundException {
+        List<AdvisorBean> advisorBeanList = new ArrayList<>();
+        VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, secondPattern);
+        collector.visit(StaticJavaParser.parse(f), advisorBeanList);
+        if (advisorBeanList.size() > 0) {
+            AdvisorBean b = advisorBeanList.get(0);
+            b.setFile(f);
+            return b;
         }
-
-        private boolean isSameArgumentTypes(String[] params, NodeList<Expression> nodeList) {
-            if (nodeList.size() != params.length) {
-                return false;
-            }
-            for (int i = 0; i < nodeList.size(); i++) {
-                Expression argument = nodeList.get(i);
-                if (argument instanceof ObjectCreationExpr) {
-                    ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
-                    if (!type.getName().asString().equals(params[i])) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
+        return null;
     }
 }

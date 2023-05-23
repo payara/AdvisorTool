@@ -42,16 +42,16 @@ package fish.payara.advisor;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.visitor.VoidVisitor;
-
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public interface AdvisorInterface {
 
     VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params);
+
+    VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String secondPattern);
 
     default AdvisorBean parseFile(String keyPattern, String valuePattern, File f, String... params) throws FileNotFoundException {
         List<AdvisorBean> advisorBeanList = new ArrayList<>();
