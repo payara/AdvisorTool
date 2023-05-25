@@ -83,7 +83,6 @@ public class AdvisorToolMojo extends AbstractMojo {
     @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
 
-
     @Override
     public void execute() {
         Properties patterns = null;
