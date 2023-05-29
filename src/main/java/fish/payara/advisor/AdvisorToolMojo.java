@@ -40,6 +40,13 @@
 package fish.payara.advisor;
 
 import fish.payara.advisor.config.files.BeansXml;
+import fish.payara.advisor.config.files.JaxWsProperties;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -77,7 +84,6 @@ public class AdvisorToolMojo extends AbstractMojo {
     @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
 
-
     @Override
     public void execute() {
         Properties patterns = null;
@@ -87,22 +93,24 @@ public class AdvisorToolMojo extends AbstractMojo {
             this.adviseVersion = properties.getProperty(ADVISE_VERSION);
         }
         try {
-            if(adviseVersion != null && !adviseVersion.isEmpty()) {
+            if (adviseVersion != null && !adviseVersion.isEmpty()) {
                 patterns = loadPatterns(adviseVersion);
             } else {
                 log.severe("You need to indicate adviseVersion option");
                 return;
             }
-            //readSourceFiles
+
             List<File> files = readSourceFiles();
             if (!files.isEmpty()) {
                 if (patterns != null && !patterns.isEmpty()) {
-                    //searchPatterns
                     advisorBeans = inspectCode(patterns, files);
-
                 }
+            }
+            files = readConfigFiles();
+            if (!files.isEmpty()) {
                 this.checkConfigFiles(advisorBeans, files);
             }
+
             //print messages
             addMessages(advisorBeans);
             printToConsole(advisorBeans);
@@ -112,14 +120,21 @@ public class AdvisorToolMojo extends AbstractMojo {
     }
 
     private void checkConfigFiles(List<AdvisorBean> advisorBeans, List<File> files) {
-        Analyzer<List<AdvisorBean>> beanAnalyzer = new BeansXml();
+        Analyzer<List<AdvisorBean>> beanAnalyzer;
 
         boolean beanXmlNotFound = true;
         for (File file : files) {
-            if (file.isFile() && "beans.xml".equals(file.getName())) {
-                beanXmlNotFound = false;
-                List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
-                if (advisorsFromAnalyzer.size() > 0) {
+            if (file.isFile()) {
+                if ("beans.xml".equals(file.getName())) {
+                    beanAnalyzer = new BeansXml();
+                    beanXmlNotFound = false;
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                    if (advisorsFromAnalyzer.size() > 0) {
+                        advisorBeans.addAll(advisorsFromAnalyzer);
+                    }
+                } else if ("jaxws.properties".equals(file.getName())) {
+                    beanAnalyzer = new JaxWsProperties();
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
                     advisorBeans.addAll(advisorsFromAnalyzer);
                 }
             }
@@ -160,15 +175,27 @@ public class AdvisorToolMojo extends AbstractMojo {
     }
 
     public List<File> readSourceFiles() throws IOException {
-        List<File> availableFiles = new ArrayList<>();
+        List<File>javaFiles = new ArrayList<>();
         if(project.getBasedir() != null) {
-            availableFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
+            javaFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
                     .filter(Files::isRegularFile).filter(
-                            p -> p.toString().endsWith(".java") || p.toString().endsWith(".xml"))
+                            p -> p.toString().endsWith(".java"))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
-        return availableFiles;
+        return javaFiles;
+    }
+
+    public List<File> readConfigFiles() throws IOException {
+        List<File> configFiles = new ArrayList<>();
+        if(project.getBasedir() != null) {
+            configFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
+                    .filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".xml")
+                                    || p.toString().endsWith(".properties"))
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        }
+        return configFiles;
     }
 
     public List<AdvisorBean> inspectCode(Properties patterns, List<File> files) throws IOException {

@@ -74,7 +74,7 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
                         setFile(file).
                         setLine("0").
                         setMethodDeclaration("empty beans.xml").build();
-                advisors.add(advisorFileBean);//put("empty-beans-xml", "jakarta-cdi-messages.properties");
+                advisors.add(advisorFileBean);
             }
         } catch (SAXException | IOException | ParserConfigurationException e) {
             e.printStackTrace();
