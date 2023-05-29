@@ -40,12 +40,6 @@
 package fish.payara.advisor;
 
 import fish.payara.advisor.config.files.BeansXml;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -215,27 +209,32 @@ public class AdvisorToolMojo extends AbstractMojo {
         AdvisorBean advisorBean = null;
         AdvisorClassImport acimp = new AdvisorClassImport();
         try {
-            advisorBean = acimp.parseFile((String) key, importNameSpace, sourceFile);
+            advisorBean = acimp.parseFile(key, importNameSpace, sourceFile);
             //check if method call
             if(advisorBean != null) {
                 AdvisorMethodCall amc = new AdvisorMethodCall();
                 if (methodCall.contains("(") && methodCall.contains(")")) {
                     String args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
                     if (args.indexOf(',') > -1) {
-                        advisorBean = amc.parseFile((String) key, methodCall, sourceFile, args.split(","));
+                        advisorBean = amc.parseFile(key, methodCall, sourceFile, args.split(","));
                     } else {
-                        advisorBean = amc.parseFile((String) key, methodCall, sourceFile, args);
+                        advisorBean = amc.parseFile(key, methodCall, sourceFile, args);
                     }
+                } else if(methodCall.contains("constructor")){
+                    AdvisorConstructorCall acc = new AdvisorConstructorCall();
+                    String constructorClass = importNameSpace.substring(importNameSpace.lastIndexOf(".") + 1, 
+                            importNameSpace.length());
+                    advisorBean = acc.parseFile(key, constructorClass, sourceFile);
                 } else {
-                    advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
+                    advisorBean = amc.parseFile(key, methodCall, sourceFile);
                 }
-                //advisorBean = amc.parseFile((String) key, methodCall, sourceFile);
+                
                 if (advisorBean != null) {
                     advisorsList.add(advisorBean);
                 } else {
                     //check if method declaration
                     AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
-                    advisorBean = amd.parseFile((String)key, methodCall, sourceFile);
+                    advisorBean = amd.parseFile(key, methodCall, sourceFile);
                     if(advisorBean != null) {
                         advisorsList.add(advisorBean);
                     }
@@ -253,11 +252,11 @@ public class AdvisorToolMojo extends AbstractMojo {
         AdvisorBean advisorBean = null;
         AdvisorClassImport acimp = new AdvisorClassImport();
         try {
-            advisorBean = acimp.parseFile((String) key, importAnnotationNameSpace, sourceFile);
+            advisorBean = acimp.parseFile(key, importAnnotationNameSpace, sourceFile);
             //check if annotation with property
             if (advisorBean != null) {
                 AdvisorAnnotationWithProperty aacwp = new AdvisorAnnotationWithProperty();
-                advisorBean = aacwp.parseFile((String) key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
+                advisorBean = aacwp.parseFile(key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
                 if(advisorBean != null) {
                     advisorsList.add(advisorBean);
                 }
