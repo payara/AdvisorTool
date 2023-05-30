@@ -41,7 +41,9 @@ package fish.payara.advisor;
 
 import com.github.javaparser.Position;
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.io.File;
@@ -86,6 +88,32 @@ public class AdvisorAnnotationWithProperty implements AdvisorInterface {
                     collector.add(advisorBean);
             }
             
+        }
+
+        @Override
+        public void visit(SingleMemberAnnotationExpr singleMemberAnnotationExpr, List<AdvisorBean> collector) {
+            super.visit(singleMemberAnnotationExpr, collector);
+            Optional<Position> p = singleMemberAnnotationExpr.getBegin();
+            String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
+            if(singleMemberAnnotationExpr.toString().contains(annotationName) && singleMemberAnnotationExpr.toString().contains(secondPattern)) {
+                AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName +"@"+secondPattern)
+                        .setLine((p.map(position -> "" + position.line).orElse("")))
+                        .setAnnotationDeclaration(singleMemberAnnotationExpr.toString()).build();
+                collector.add(advisorBean);
+            }
+        }
+
+        @Override
+        public void visit(MarkerAnnotationExpr markerAnnotationExpr, List<AdvisorBean> collector) {
+            super.visit(markerAnnotationExpr, collector);
+            Optional<Position> p = markerAnnotationExpr.getBegin();
+            String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
+            if (markerAnnotationExpr.toString().contains(annotationName) && markerAnnotationExpr.toString().contains(secondPattern)) {
+                AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName + "@" + secondPattern)
+                        .setLine((p.map(position -> "" + position.line).orElse("")))
+                        .setAnnotationDeclaration(markerAnnotationExpr.toString()).build();
+                collector.add(advisorBean);
+            }
         }
     }
 
