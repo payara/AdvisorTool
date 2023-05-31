@@ -66,11 +66,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 
 @Mojo(name = "advise", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
@@ -202,9 +197,6 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<AdvisorBean> advisorsList = new ArrayList<>();
         AdvisorInterface[] advisorInterfaces = new AdvisorInterface[]{new AdvisorMethodCall(), new AdvisorClassImport()};
         for (File sourceFile : files) {
-            if (sourceFile.getName().endsWith(".xml")) {
-                continue;
-            }
             patterns.forEach((k, v) -> {
                 String value = (String) v;
                 if (value.contains("#")) {
