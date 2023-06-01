@@ -75,7 +75,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-@Mojo(name = "advise", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "advice", defaultPhase = LifecyclePhase.VERIFY)
 public class AdvisorToolMojo extends AbstractMojo {
 
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
@@ -119,7 +119,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             if (!files.isEmpty()) {
                 this.checkConfigFiles(advisorBeans, files);
             }
-
+            setLogSeverityForMessages(advisorBeans);
             //print messages
             addMessages(advisorBeans);
             printToConsole(advisorBeans);
@@ -337,6 +337,18 @@ public class AdvisorToolMojo extends AbstractMojo {
             throw new RuntimeException(e);
         }
     }
+
+    public void setLogSeverityForMessages(List<AdvisorBean> advisorMethodBeanList) {
+        advisorMethodBeanList.forEach(b -> {
+            String logSeverity = b.getKeyPattern().contains("info") ? "info" : (
+                    b.getKeyPattern().contains("warn") ? "warn" : (b.getKeyPattern().contains("error") ? "error" : "")
+            );
+            if(!logSeverity.isEmpty()) {
+                b.setType(AdvisorType.valueOf(logSeverity.toUpperCase()));
+                b.setKeyPattern(b.getKeyPattern().substring(0, b.getKeyPattern().indexOf(logSeverity) - 1));
+            }
+        });
+    }
     
     public void addMessages(List<AdvisorBean> advisorMethodBeanList) {
         addMessages("config/jakarta" + adviseVersion + "/advisorMessages", advisorMethodBeanList, "message");
@@ -368,8 +380,7 @@ public class AdvisorToolMojo extends AbstractMojo {
         String keyIssue = null;
         Properties messageProperties = new Properties();
         String subSpec = keyPattern.contains("method") ? "method" : (
-            keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": "namespace")
-        );
+            keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": "namespace"));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
             fileMessageName = spec + "messages.properties";
@@ -414,6 +425,10 @@ public class AdvisorToolMojo extends AbstractMojo {
             advisorMessage.setFix(fix);
         }
         
+        if(b.getType() != null) {
+            advisorMessage.setType(b.getType());
+        }
+        
         b.setAdvisorMessage(advisorMessage);
     }
     
@@ -421,7 +436,23 @@ public class AdvisorToolMojo extends AbstractMojo {
         getLog().info("Showing Advices");
         getLog().info("***************");
         advisorMethodBeanList.forEach(b -> {
-            getLog().warn(b.toString());
+            if(b.getType() != null) {
+                switch (b.getType()) {
+                    case INFO:
+                        getLog().info(b.toString());
+                        break;
+                    case WARN:
+                        getLog().warn(b.toString());
+                        break;
+                    case ERROR:
+                        getLog().error(b.toString());
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                getLog().info(b.toString());  
+            }
         });
     }
     

@@ -41,7 +41,8 @@ package fish.payara.advisor;
 
 public enum AdvisorType {
     
-    WARNING,
+    INFO,
+    WARN,
     ERROR
     
 }
