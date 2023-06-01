@@ -425,6 +425,10 @@ public class AdvisorToolMojo extends AbstractMojo {
             advisorMessage.setFix(fix);
         }
         
+        if(b.getType() != null) {
+            advisorMessage.setType(b.getType());
+        }
+        
         b.setAdvisorMessage(advisorMessage);
     }
     
