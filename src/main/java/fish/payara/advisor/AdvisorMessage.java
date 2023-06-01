@@ -42,10 +42,14 @@ package fish.payara.advisor;
 public class AdvisorMessage {
 
     public static final String YELLOW = "\033[0;33m";
-    public static final String RESET = "\033[0m";
+    public static final String GREEN = "\033[0;32m";
+    public static final String RED = "\033[0;31m";
     public static final String BLUE = "\033[0;34m";
+    public static final String RESET = "\033[0m";
     private String message;
     private String fix;
+    
+    private AdvisorType type;
 
     private AdvisorMessage(AdvisorMessageBuilder advisorMessageBuilder) {
         this.message = advisorMessageBuilder.message;
@@ -68,9 +72,27 @@ public class AdvisorMessage {
         this.fix = fix;
     }
 
+    public AdvisorType getType() {
+        return type;
+    }
+
+    public void setType(AdvisorType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
-        return YELLOW + message + RESET + "\n" + BLUE + fix + RESET;
+        if(this.getType() != null) {
+            switch (this.getType()) {
+                case INFO:
+                    return GREEN + message + RESET + "\n" + BLUE + fix + RESET;
+                case WARN:
+                    return YELLOW + message + RESET + "\n" + BLUE + fix + RESET;
+                case ERROR:
+                    return RED + message + RESET + "\n" + BLUE + fix + RESET;
+            }
+        }
+        return "";
     }
 
     public static class AdvisorMessageBuilder {
