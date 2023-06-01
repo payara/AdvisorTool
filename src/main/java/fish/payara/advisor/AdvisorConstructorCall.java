@@ -46,12 +46,11 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
 import java.util.Optional;
 
-public class AdvisorConstructorCall implements AdvisorInterface {
-
+public class AdvisorConstructorCall extends AdvisorMethodCall implements AdvisorInterface {
 
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
-        return new AdvisorConstructorCall.ConstructorCallCollector(keyPattern, valuePattern);
+        return new AdvisorConstructorCall.ConstructorCallCollector(keyPattern, valuePattern, params);
     }
 
     @Override
@@ -62,24 +61,34 @@ public class AdvisorConstructorCall implements AdvisorInterface {
     private static class ConstructorCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
         private final String keyPattern;
         private final String valuePattern;
-        public ConstructorCallCollector(String keyPattern, String valuePattern) {
+        private final String[] params;
+
+        public ConstructorCallCollector(String keyPattern, String valuePattern, String... params) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
+            this.params = params;
         }
 
         @Override
         public void visit(ObjectCreationExpr objectCreationExpr, List<AdvisorBean> advisorBeans) {
             super.visit(objectCreationExpr, advisorBeans);
             Optional<Position> p = objectCreationExpr.getBegin();
-            if(objectCreationExpr.isObjectCreationExpr() &&
+            if (objectCreationExpr.isObjectCreationExpr() &&
                     objectCreationExpr.toString().contains(valuePattern)) {
-                AdvisorBean advisorMethodBean = new AdvisorBean.
-                        AdvisorBeanBuilder(keyPattern, valuePattern).
-                        setLine((p.map(position -> "" + position.line).orElse(""))).
-                        setMethodDeclaration(objectCreationExpr.toString()).build();
-                advisorBeans.add(advisorMethodBean);
+                if (params.length == 0) {
+                    AdvisorBean advisorMethodBean = new AdvisorBean.
+                            AdvisorBeanBuilder(keyPattern, valuePattern).
+                            setLine((p.map(position -> "" + position.line).orElse(""))).
+                            setMethodDeclaration(objectCreationExpr.toString()).build();
+                    advisorBeans.add(advisorMethodBean);
+                } else if (isSameArgumentTypes(params, objectCreationExpr.getArguments())) {
+                    AdvisorBean advisorMethodBean = new AdvisorBean.
+                            AdvisorBeanBuilder(keyPattern, valuePattern).
+                            setLine((p.map(position -> "" + position.line).orElse(""))).
+                            setMethodDeclaration(objectCreationExpr.toString()).build();
+                    advisorBeans.add(advisorMethodBean);
+                }
             }
         }
     }
-    
 }

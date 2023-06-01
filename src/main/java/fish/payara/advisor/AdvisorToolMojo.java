@@ -211,7 +211,7 @@ public class AdvisorToolMojo extends AbstractMojo {
                         } catch (FileNotFoundException e) {
                             throw new RuntimeException(e);
                         }
-                        if (advisorBean != null) {
+                        if (advisorBean != null && !advisorsList.contains(advisorBean)) {
                             advisorsList.add(advisorBean);
                         }
                     }
@@ -232,29 +232,39 @@ public class AdvisorToolMojo extends AbstractMojo {
             //check if method call
             if(advisorBean != null) {
                 AdvisorMethodCall amc = new AdvisorMethodCall();
+                String args = "";
                 if (methodCall.contains("(") && methodCall.contains(")")) {
-                    String args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
+                    args = methodCall.substring(methodCall.indexOf('(') + 1, methodCall.indexOf(')'));
+                }
+                if (methodCall.contains("constructor")){
+                    AdvisorConstructorCall acc = new AdvisorConstructorCall();
+                    String constructorClass = importNameSpace.substring(importNameSpace.lastIndexOf(".") + 1);
+                    if (args.length() > 0) {
+                        if (args.indexOf(',') > -1) {
+                            advisorBean = acc.parseFile(key, constructorClass, sourceFile, args.split(","));
+                        } else {
+                            advisorBean = acc.parseFile(key, constructorClass, sourceFile, args);
+                        }
+                    } else {
+                        advisorBean = acc.parseFile(key, constructorClass, sourceFile);
+                    }
+                } else if (methodCall.contains("(") && methodCall.contains(")")) {
                     if (args.indexOf(',') > -1) {
                         advisorBean = amc.parseFile(key, methodCall, sourceFile, args.split(","));
                     } else {
                         advisorBean = amc.parseFile(key, methodCall, sourceFile, args);
                     }
-                } else if(methodCall.contains("constructor")){
-                    AdvisorConstructorCall acc = new AdvisorConstructorCall();
-                    String constructorClass = importNameSpace.substring(importNameSpace.lastIndexOf(".") + 1, 
-                            importNameSpace.length());
-                    advisorBean = acc.parseFile(key, constructorClass, sourceFile);
                 } else {
                     advisorBean = amc.parseFile(key, methodCall, sourceFile);
                 }
                 
-                if (advisorBean != null) {
+                if (advisorBean != null && !advisorsList.contains(advisorBean)) {
                     advisorsList.add(advisorBean);
                 } else {
                     //check if method declaration
                     AdvisorMethodDeclaration amd = new AdvisorMethodDeclaration();
                     advisorBean = amd.parseFile(key, methodCall, sourceFile);
-                    if(advisorBean != null) {
+                    if(advisorBean != null && !advisorsList.contains(advisorBean)) {
                         advisorsList.add(advisorBean);
                     }
                 }
@@ -263,7 +273,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void processAnnotation(String value, String key, File sourceFile, List<AdvisorBean> advisorsList) {
         String importAnnotationNameSpace = value.substring(0, value.indexOf("@"));
         String annotationPropertyDeclaration = value.substring(value.indexOf("@") + 1, value.length());
@@ -276,7 +286,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             if (advisorBean != null) {
                 AdvisorAnnotationWithProperty aacwp = new AdvisorAnnotationWithProperty();
                 advisorBean = aacwp.parseFile(key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
-                if(advisorBean != null) {
+                if(advisorBean != null && !advisorsList.contains(advisorBean)) {
                     advisorsList.add(advisorBean);
                 }
             }
