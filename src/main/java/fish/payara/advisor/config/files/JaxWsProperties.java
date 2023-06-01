@@ -41,6 +41,7 @@
 package fish.payara.advisor.config.files;
 
 import fish.payara.advisor.AdvisorBean;
+import fish.payara.advisor.AdvisorType;
 import fish.payara.advisor.Analyzer;
 
 import java.io.File;
@@ -58,6 +59,7 @@ public class JaxWsProperties implements Analyzer<List<AdvisorBean>> {
                 AdvisorBeanBuilder("jakarta-xml-web-services-file-found-jaxws-properties", "found.jaxws.properties").
                 setFile(file).
                 setLine("0").
+                setType(AdvisorType.ERROR).
                 setMethodDeclaration("found jaxws.properties").build();
         advisors.add(advisorFileBean);
 

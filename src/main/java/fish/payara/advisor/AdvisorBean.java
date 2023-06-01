@@ -55,6 +55,8 @@ public class AdvisorBean {
     private String valuePattern;
     private AdvisorMessage advisorMessage;
     
+    private AdvisorType type;
+    
     private AdvisorBean(AdvisorBeanBuilder advisorBeanBuilder) {
         this.file = advisorBeanBuilder.file;
         this.methodDeclaration = advisorBeanBuilder.methodDeclaration;
@@ -64,6 +66,7 @@ public class AdvisorBean {
         this.valuePattern = advisorBeanBuilder.valuePattern;
         this.advisorMessage = advisorBeanBuilder.advisorMessage;
         this.annotationDeclaration = advisorBeanBuilder.annotationDeclaration;
+        this.type = advisorBeanBuilder.type;
     }
 
     public File getFile() {
@@ -130,6 +133,14 @@ public class AdvisorBean {
         this.annotationDeclaration = annotationDeclaration;
     }
 
+    public AdvisorType getType() {
+        return type;
+    }
+
+    public void setType(AdvisorType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "Line of code: " + (line == null ? "-" : line) + " | Expression: " + getExpression() + "\n"+
@@ -161,6 +172,8 @@ public class AdvisorBean {
         final private String valuePattern;
 
         private AdvisorMessage advisorMessage;
+        
+        private AdvisorType type;
 
         public AdvisorBeanBuilder(String keyPattern, String valuePattern) {
             this.keyPattern = keyPattern;
@@ -194,6 +207,11 @@ public class AdvisorBean {
         
         public AdvisorBeanBuilder setAnnotationDeclaration(String annotationDeclaration) {
             this.annotationDeclaration = annotationDeclaration;
+            return this;
+        }
+        
+        public AdvisorBeanBuilder setType(AdvisorType type) {
+            this.type = type;
             return this;
         }
         
