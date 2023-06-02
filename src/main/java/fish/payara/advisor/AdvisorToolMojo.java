@@ -44,6 +44,8 @@ import fish.payara.advisor.config.files.JaxWsProperties;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import fish.payara.advisor.config.files.JaxmProperties;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -140,6 +142,12 @@ public class AdvisorToolMojo extends AbstractMojo {
                     beanAnalyzer = new JaxWsProperties();
                     List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
                     advisorBeans.addAll(advisorsFromAnalyzer);
+                } else if ("jaxm.properties".equals(file.getName())) {
+                    beanAnalyzer = new JaxmProperties();
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                    if (!advisorBeans.containsAll(advisorsFromAnalyzer)) {
+                        advisorBeans.addAll(advisorsFromAnalyzer);
+                    }
                 }
             }
         }
