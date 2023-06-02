@@ -108,21 +108,21 @@ public class AdvisorMethodCall implements AdvisorInterface {
                 collector.add(advisorMethodBean);
             }
         }
+    }
 
-        private boolean isSameArgumentTypes(String[] params, NodeList<Expression> nodeList) {
-            if (nodeList.size() != params.length) {
-                return false;
-            }
-            for (int i = 0; i < nodeList.size(); i++) {
-                Expression argument = nodeList.get(i);
-                if (argument instanceof ObjectCreationExpr) {
-                    ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
-                    if (!type.getName().asString().equals(params[i])) {
-                        return false;
-                    }
+    protected static boolean isSameArgumentTypes(String[] params, NodeList<Expression> nodeList) {
+        if (nodeList.size() != params.length) {
+            return false;
+        }
+        for (int i = 0; i < nodeList.size(); i++) {
+            Expression argument = nodeList.get(i);
+            if (argument instanceof ObjectCreationExpr) {
+                ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
+                if (!type.getName().asString().equals(params[i])) {
+                    return false;
                 }
             }
-            return true;
         }
+        return true;
     }
 }
