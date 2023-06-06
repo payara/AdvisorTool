@@ -184,11 +184,14 @@ public class AdvisorToolMojo extends AbstractMojo {
                     deprecatedTags.stream().forEach(entry -> {
                         String valuePattern = (String) entry.getValue();
                         String key = (String) entry.getKey();
-                        Optional<String> result = allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
+                        Optional<String> result = valuePattern.contains("#") ?
+                                allLines.stream().filter(s -> s.contains(valuePattern.split("#")[0]) &&
+                                        s.contains(valuePattern.split("#")[1])).findAny()
+                                : allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
                         if (result.isPresent()) {
                             AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
                                     .setFile(sourceFile)
-                                    .setMethodDeclaration("tag " + valuePattern + " was deprecated").build();
+                                    .setMethodDeclaration(valuePattern + " was deprecated").build();
                             advisorBeans.add(advisorJSPBean);
                         }
                     });
