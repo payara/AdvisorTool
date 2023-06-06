@@ -163,25 +163,39 @@ public class AdvisorToolMojo extends AbstractMojo {
         Set<Map.Entry> namespaceProperties = patterns.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().contains("namespace-upgrade"))
                 .collect(Collectors.toSet());
+        Set<Map.Entry> deprecatedTags = patterns.entrySet().stream()
+                .filter(entry -> entry.getKey().toString().contains("tag-deprecated"))
+                .collect(Collectors.toSet());
         for (File sourceFile : files) {
-            namespaceProperties.stream().forEach(entry -> {
-                String valuePattern = (String) entry.getValue();
-                String key = (String) entry.getKey();
-                if(sourceFile.exists() && sourceFile.isFile()) {
-                    try {
-                        List<String> allLines = Files.readAllLines(Paths.get(sourceFile.toURI()));
+            if(sourceFile.exists() && sourceFile.isFile()) {
+                try {
+                    List<String> allLines = Files.readAllLines(Paths.get(sourceFile.toURI()));
+                    namespaceProperties.stream().forEach(entry -> {
+                        String valuePattern = (String) entry.getValue();
+                        String key = (String) entry.getKey();
                         Optional<String> result = allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
-                        if(result.isPresent()) {
-                            AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key,valuePattern)
+                        if (result.isPresent()) {
+                            AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
                                     .setFile(sourceFile)
-                                    .setMethodDeclaration("namespace:"+valuePattern+" was replaced").build();
-                            advisorBeans.add(advisorJSPBean); 
+                                    .setMethodDeclaration("namespace:" + valuePattern + " was replaced").build();
+                            advisorBeans.add(advisorJSPBean);
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    });
+                    deprecatedTags.stream().forEach(entry -> {
+                        String valuePattern = (String) entry.getValue();
+                        String key = (String) entry.getKey();
+                        Optional<String> result = allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
+                        if (result.isPresent()) {
+                            AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
+                                    .setFile(sourceFile)
+                                    .setMethodDeclaration("tag " + valuePattern + " was deprecated").build();
+                            advisorBeans.add(advisorJSPBean);
+                        }
+                    });
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-            });
+            }
         }
     }
 
@@ -216,8 +230,9 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<File>javaFiles = new ArrayList<>();
         if(project.getBasedir() != null) {
             javaFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
-                    .filter(Files::isRegularFile).filter(
-                            p -> p.toString().endsWith(".java"))
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.toString().endsWith(".java"))
+                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
@@ -230,6 +245,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             configFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
                     .filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".xml")
                                     || p.toString().endsWith(".properties"))
+                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
@@ -240,7 +256,10 @@ public class AdvisorToolMojo extends AbstractMojo {
         List<File> jspFiles = new ArrayList<>();
         if(project.getBasedir() != null) {
             jspFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
-                    .filter(Files::isRegularFile).filter(p->p.toString().endsWith(".jsp")).map(Path::toFile)
+                    .filter(Files::isRegularFile)
+                    .filter(p->p.toString().endsWith(".jsp"))
+                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
+                    .map(Path::toFile)
                     .collect(Collectors.toList());
         }
         return jspFiles;
@@ -390,7 +409,8 @@ public class AdvisorToolMojo extends AbstractMojo {
         String keyIssue = null;
         Properties messageProperties = new Properties();
         String subSpec = keyPattern.contains("method") ? "method" : (
-            keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": "namespace"));
+            keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": (
+                    keyPattern.contains("namespace") ? "namespace" : "tag")));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
             fileMessageName = spec + "messages.properties";
