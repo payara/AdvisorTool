@@ -107,9 +107,9 @@ public class AdvisorToolMojo extends AbstractMojo {
                 }
             }
             
-            files = readJSPFiles();
+            files = readJSPandJSFFiles();
             if(!files.isEmpty()) {
-                checkJspFiles(patterns, advisorBeans, files);
+                checkJspandJSFFiles(patterns, advisorBeans, files);
             }
             
             files = readConfigFiles();
@@ -159,7 +159,7 @@ public class AdvisorToolMojo extends AbstractMojo {
         }
     }
     
-    private void checkJspFiles(Properties patterns, List<AdvisorBean> advisorBeans, List<File> files) {
+    private void checkJspandJSFFiles(Properties patterns, List<AdvisorBean> advisorBeans, List<File> files) {
         Set<Map.Entry> namespaceProperties = patterns.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().contains("namespace-upgrade"))
                 .collect(Collectors.toSet());
@@ -175,10 +175,10 @@ public class AdvisorToolMojo extends AbstractMojo {
                         String key = (String) entry.getKey();
                         Optional<String> result = allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
                         if (result.isPresent()) {
-                            AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
+                            AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
                                     .setFile(sourceFile)
                                     .setMethodDeclaration("namespace:" + valuePattern + " was replaced").build();
-                            advisorBeans.add(advisorJSPBean);
+                            advisorBeans.add(advisorBean);
                         }
                     });
                     deprecatedTags.stream().forEach(entry -> {
@@ -189,10 +189,10 @@ public class AdvisorToolMojo extends AbstractMojo {
                                         s.contains(valuePattern.split("#")[1])).findAny()
                                 : allLines.stream().filter(s -> s.contains(valuePattern)).findAny();
                         if (result.isPresent()) {
-                            AdvisorBean advisorJSPBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
+                            AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(key, valuePattern)
                                     .setFile(sourceFile)
                                     .setMethodDeclaration(valuePattern + " was deprecated").build();
-                            advisorBeans.add(advisorJSPBean);
+                            advisorBeans.add(advisorBean);
                         }
                     });
                 } catch (IOException e) {
@@ -255,12 +255,12 @@ public class AdvisorToolMojo extends AbstractMojo {
         return configFiles;
     }
     
-    public List<File> readJSPFiles() throws IOException {
+    public List<File> readJSPandJSFFiles() throws IOException {
         List<File> jspFiles = new ArrayList<>();
         if(project.getBasedir() != null) {
             jspFiles = Files.walk(Paths.get(project.getBasedir().toURI()))
                     .filter(Files::isRegularFile)
-                    .filter(p->p.toString().endsWith(".jsp"))
+                    .filter(p->p.toString().endsWith(".jsp") || p.toString().endsWith(".xhtml"))
                     .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
@@ -323,6 +323,10 @@ public class AdvisorToolMojo extends AbstractMojo {
                     } else {
                         advisorBean = acc.parseFile(key, constructorClass, sourceFile);
                     }
+                } else if(methodCall.contains("constant")) {
+                    AdvisorFieldCall afc = new AdvisorFieldCall();
+                    String constantName = methodCall.substring(9, methodCall.length());
+                    advisorBean = afc.parseFile(key, constantName, sourceFile, args);
                 } else if (methodCall.contains("(") && methodCall.contains(")")) {
                     if (args.indexOf(',') > -1) {
                         advisorBean = amc.parseFile(key, methodCall, sourceFile, args.split(","));

@@ -77,7 +77,7 @@ public class AdvisorBean {
         if (obj instanceof AdvisorBean) {
             final AdvisorBean other = (AdvisorBean) obj;
             return this.file.equals(other.file) && this.line.equals(other.line)
-                    && this.keyPattern.equals(other.keyPattern) && this.valuePattern.equals(other.valuePattern);
+                    && this.valuePattern.equals(other.valuePattern);
         }
         return false;
     }

@@ -41,6 +41,7 @@ package fish.payara.advisor;
 
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
@@ -86,6 +87,22 @@ public class AdvisorConstructorCall extends AdvisorMethodCall implements Advisor
                             AdvisorBeanBuilder(keyPattern, valuePattern).
                             setLine((p.map(position -> "" + position.line).orElse(""))).
                             setMethodDeclaration(objectCreationExpr.toString()).build();
+                    advisorBeans.add(advisorMethodBean);
+                }
+            }
+        }
+
+        @Override
+        public void visit(ExplicitConstructorInvocationStmt explicitConstructorInvocationStmt,
+                          List<AdvisorBean> advisorBeans) {
+            super.visit(explicitConstructorInvocationStmt, advisorBeans);
+            Optional<Position> p = explicitConstructorInvocationStmt.getBegin();
+            if(explicitConstructorInvocationStmt.isExplicitConstructorInvocationStmt()) {
+                if (params.length == 0) {
+                    AdvisorBean advisorMethodBean = new AdvisorBean.
+                            AdvisorBeanBuilder(keyPattern, valuePattern).
+                            setLine((p.map(position -> "" + position.line).orElse(""))).
+                            setMethodDeclaration(explicitConstructorInvocationStmt.toString()).build();
                     advisorBeans.add(advisorMethodBean);
                 }
             }
