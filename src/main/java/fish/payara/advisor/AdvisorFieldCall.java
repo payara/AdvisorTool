@@ -40,18 +40,17 @@
 package fish.payara.advisor;
 
 import com.github.javaparser.Position;
-import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
 import java.util.Optional;
 
-public class AdvisorConstructorCall extends AdvisorMethodCall implements AdvisorInterface {
+public class AdvisorFieldCall implements AdvisorInterface {
 
     @Override
     public VoidVisitor<List<AdvisorBean>> createVoidVisitor(String keyPattern, String valuePattern, String... params) {
-        return new AdvisorConstructorCall.ConstructorCallCollector(keyPattern, valuePattern, params);
+        return new AdvisorFieldCall.FieldCallCollector(keyPattern, valuePattern, params);
     }
 
     @Override
@@ -59,52 +58,27 @@ public class AdvisorConstructorCall extends AdvisorMethodCall implements Advisor
         return null;
     }
 
-    private static class ConstructorCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
+    private static class FieldCallCollector extends VoidVisitorAdapter<List<AdvisorBean>> {
+
         private final String keyPattern;
         private final String valuePattern;
         private final String[] params;
 
-        public ConstructorCallCollector(String keyPattern, String valuePattern, String... params) {
+        public FieldCallCollector(String keyPattern, String valuePattern, String... params) {
             this.keyPattern = keyPattern;
             this.valuePattern = valuePattern;
             this.params = params;
         }
 
         @Override
-        public void visit(ObjectCreationExpr objectCreationExpr, List<AdvisorBean> advisorBeans) {
-            super.visit(objectCreationExpr, advisorBeans);
-            Optional<Position> p = objectCreationExpr.getBegin();
-            if (objectCreationExpr.isObjectCreationExpr() &&
-                    objectCreationExpr.toString().contains(valuePattern)) {
-                if (params.length == 0) {
-                    AdvisorBean advisorMethodBean = new AdvisorBean.
-                            AdvisorBeanBuilder(keyPattern, valuePattern).
-                            setLine((p.map(position -> "" + position.line).orElse(""))).
-                            setMethodDeclaration(objectCreationExpr.toString()).build();
-                    advisorBeans.add(advisorMethodBean);
-                } else if (isSameArgumentTypes(params, objectCreationExpr.getArguments())) {
-                    AdvisorBean advisorMethodBean = new AdvisorBean.
-                            AdvisorBeanBuilder(keyPattern, valuePattern).
-                            setLine((p.map(position -> "" + position.line).orElse(""))).
-                            setMethodDeclaration(objectCreationExpr.toString()).build();
-                    advisorBeans.add(advisorMethodBean);
-                }
-            }
-        }
-
-        @Override
-        public void visit(ExplicitConstructorInvocationStmt explicitConstructorInvocationStmt,
-                          List<AdvisorBean> advisorBeans) {
-            super.visit(explicitConstructorInvocationStmt, advisorBeans);
-            Optional<Position> p = explicitConstructorInvocationStmt.getBegin();
-            if(explicitConstructorInvocationStmt.isExplicitConstructorInvocationStmt()) {
-                if (params.length == 0) {
-                    AdvisorBean advisorMethodBean = new AdvisorBean.
-                            AdvisorBeanBuilder(keyPattern, valuePattern).
-                            setLine((p.map(position -> "" + position.line).orElse(""))).
-                            setMethodDeclaration(explicitConstructorInvocationStmt.toString()).build();
-                    advisorBeans.add(advisorMethodBean);
-                }
+        public void visit(FieldAccessExpr fieldAccessExpr, List<AdvisorBean> advisorBeanList) {
+            super.visit(fieldAccessExpr, advisorBeanList);
+            Optional<Position> p = fieldAccessExpr.getBegin();
+            if(fieldAccessExpr.isFieldAccessExpr() && fieldAccessExpr.toString().contains(valuePattern)) {
+                AdvisorBean advisorFieldBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
+                        setLine((p.map(position -> "" + position.line).orElse("")))
+                        .setMethodDeclaration(fieldAccessExpr.toString()).build();
+                advisorBeanList.add(advisorFieldBean);
             }
         }
     }
