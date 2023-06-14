@@ -41,6 +41,7 @@ package fish.payara.advisor;
 
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -105,6 +106,18 @@ public class AdvisorMethodCall implements AdvisorInterface {
                 AdvisorBean advisorMethodBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
                         setLine((p.map(position -> "" + position.line).orElse(""))).
                         setMethodDeclaration(classExpr.toString()).build();
+                collector.add(advisorMethodBean);
+            }
+        }
+
+        @Override
+        public void visit(MethodDeclaration methodDeclaration, List<AdvisorBean> collector) {
+            super.visit(methodDeclaration, collector);
+            Optional<Position> p = methodDeclaration.getBegin();
+            if(methodDeclaration.isMethodDeclaration() && methodDeclaration.getDeclarationAsString().contains(valuePattern)) {
+                AdvisorBean advisorMethodBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
+                        setLine((p.map(position -> "" + position.line).orElse(""))).
+                        setMethodDeclaration(methodDeclaration.getDeclarationAsString()).build();
                 collector.add(advisorMethodBean);
             }
         }
