@@ -140,4 +140,21 @@ class AdvisorMethodCallTest {
                 "JaxbAdapter", resourceFile);
         assertNotNull(expectedBean);
     }
+    @Test
+    void createBeanFromParsingFileWithMethodCallWithParameters() throws FileNotFoundException {
+        Path resourcePath = Paths.get("src", "test", "resources", "MyMethodExpression.java");
+        AdvisorMethodCall advisorMethodCall = new AdvisorMethodCall();
+        File resourceFile = resourcePath.toFile();
+        assertNotNull(resourceFile);
+        
+        VoidVisitor<List<AdvisorBean>> expectedVisitor = advisorMethodCall.createVoidVisitor(
+                "jakarta-server-pages-method-get-feature-descriptors-1-warn",
+                "el.ArrayELResolver#getFeatureDescriptors(ELContext, Object)");
+        assertNotNull(expectedVisitor);
+
+        AdvisorBean expectedBean = advisorMethodCall.parseFile(
+                "jakarta-server-pages-method-get-feature-descriptors-1-warn",
+                "getFeatureDescriptors(ELContext, Object)", resourceFile, "ELContext, Object".split(","));
+        assertNotNull(expectedBean);
+    }
 }

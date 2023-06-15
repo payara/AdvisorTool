@@ -102,8 +102,26 @@ class AdvisorConstructorCallTest {
 
         AdvisorBean expectedBean = advisorConstructorCall.parseFile(
                 "jakarta-servlet-method-removed-constructor-2-error",
-                "UnavailableException", resourceFile, "int, Servlet, String".split("."));
+                "UnavailableException", resourceFile, "int, Servlet, String".split(","));
 
+        assertNotNull(expectedBean);
+    }
+    
+    @Test 
+    void createBeanFromParsingFileWithExplicitConstructorCall() throws FileNotFoundException {
+        Path resourcePath = Paths.get("src", "test", "resources", "StateManagerWrapperImpl.java");
+        AdvisorConstructorCall advisorConstructorCall = new AdvisorConstructorCall();
+        File resourceFile = resourcePath.toFile();
+        assertNotNull(resourceFile);
+
+        VoidVisitor<List<AdvisorBean>> expectedVisitor = advisorConstructorCall
+                .createVoidVisitor("jakarta-faces-remove-state-manager-10-error",
+                        "faces.application.StateManagerWrapper#constructor");
+
+        assertNotNull(expectedVisitor);
+
+        AdvisorBean expectedBean = advisorConstructorCall.parseFile(
+                "jakarta-faces-remove-state-manager-10-error", "StateManagerWrapper", resourceFile);
         assertNotNull(expectedBean);
     }
 }

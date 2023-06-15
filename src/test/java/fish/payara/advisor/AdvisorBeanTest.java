@@ -94,5 +94,28 @@ class AdvisorBeanTest {
         assertNotNull(expectedBean.getValuePattern());
         assertNotNull(expectedBean.getFile());
         assertNotNull(expectedBean.getLine());
+        assertNotNull(expectedBean.getAnnotationDeclaration());
+        assertNull(expectedBean.getAdvisorMessage());
+        assertNull(expectedBean.getType());
+        assertNull(expectedBean.getMethodDeclaration());
+        assertNull(expectedBean.getImportDeclaration());
+    }
+    
+    @Test
+    void testAdvisorBeanEquality() throws FileNotFoundException {
+        Path resourcePath = Paths.get("src", "test", "resources", "JsonBeanTest.java");
+        AdvisorAnnotationWithProperty advisorAnnotationWithProperty = new AdvisorAnnotationWithProperty();
+        File resourceFile = resourcePath.toFile();
+        assertNotNull(resourceFile);
+
+        AdvisorBean expectedBean = advisorAnnotationWithProperty.parseFile("jakarta-jsonb-method-change-deprecate-nillable-warn",
+                "json.bind.annotation.JsonbProperty", "nillable", resourceFile);
+        assertNotNull(expectedBean);
+        
+        AdvisorBean expectedBeanToCompare = advisorAnnotationWithProperty.parseFile("jakarta-jsonb-method-change-deprecate-nillable-warn",
+                "json.bind.annotation.JsonbProperty", "nillable", resourceFile);
+        assertNotNull(expectedBeanToCompare);
+        
+        assertEquals(expectedBean, expectedBeanToCompare);
     }
 }
