@@ -37,28 +37,45 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package el;
 
-import fish.payara.advisor.AdvisorBean;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import jakarta.el.ArrayELResolver;
+import jakarta.el.ELContext;
+import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class MyMethodExpression extends MethodExpression {
 
-class BeansXmlTest {
-    
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
-        
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
+
+    @Override
+    public MethodInfo getMethodInfo(ELContext elContext) {
+        ArrayELResolver arrayELResolver = new ArrayELResolver();
+        arrayELResolver.getFeatureDescriptors(null, null);
+        return null;
     }
 
+    @Override
+    public Object invoke(ELContext elContext, Object[] objects) {
+        return null;
+    }
+
+    @Override
+    public String getExpressionString() {
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+
+    @Override
+    public boolean isLiteralText() {
+        return false;
+    }
 }

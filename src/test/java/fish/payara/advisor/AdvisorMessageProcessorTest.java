@@ -37,28 +37,54 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package fish.payara.advisor;
 
-import fish.payara.advisor.AdvisorBean;
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BeansXmlTest {
-    
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
+class AdvisorMessageProcessorTest {
+
+    @Test
+    void updateLogSeverityForMessages() throws URISyntaxException, IOException {
+        AdvisorMessageProcessor advisorMessageProcessor = new AdvisorMessageProcessor();
+        AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
+        AdvisorLoader advisorLoader = new AdvisorLoader();
+        Properties properties = advisorLoader.loadPatterns("10");
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        List<File> files = advisorLoader.loadSourceFiles(baseDir);
+
+        List<AdvisorBean> advisorBeans = advisorEvaluator.adviseCode(properties, files);
         
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
+        advisorMessageProcessor.updateLogSeverityForMessages(advisorBeans);
+
+        Optional<AdvisorBean> optionalBean = advisorBeans.stream().filter(b -> b.getType() == null).findAny();
+        assertFalse(optionalBean.isPresent());
     }
 
+    @Test
+    void addMessages() throws URISyntaxException, IOException {
+        AdvisorMessageProcessor advisorMessageProcessor = new AdvisorMessageProcessor();
+        AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
+        AdvisorLoader advisorLoader = new AdvisorLoader();
+        Properties properties = advisorLoader.loadPatterns("10");
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        List<File> files = advisorLoader.loadSourceFiles(baseDir);
+
+        List<AdvisorBean> advisorBeans = advisorEvaluator.adviseCode(properties, files);
+        advisorMessageProcessor.updateLogSeverityForMessages(advisorBeans);
+        advisorMessageProcessor.addMessages(advisorBeans, "10");
+
+        Optional<AdvisorBean> optionalBean = advisorBeans.stream().filter(b -> b.getAdvisorMessage().getFix() == null || 
+                b.getAdvisorMessage().getMessage() == null).findAny();
+        assertFalse(optionalBean.isPresent());
+    }
+    
 }

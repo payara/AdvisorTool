@@ -37,28 +37,57 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package fish.payara.advisor;
 
-import fish.payara.advisor.AdvisorBean;
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BeansXmlTest {
-    
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
+class AdvisorEvaluatorTest {
+
+    @Test
+    void adviseCode() throws URISyntaxException, IOException {
+        AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
+        AdvisorLoader advisorLoader = new AdvisorLoader();
+        Properties properties = advisorLoader.loadPatterns("10");
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        List<File> files = advisorLoader.loadSourceFiles(baseDir);
         
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
+        List<AdvisorBean> advisorBeans = advisorEvaluator.adviseCode(properties, files);
+        assertNotNull(advisorBeans);
+        assertTrue(advisorBeans.size() > 0);
     }
 
+    @Test
+    void adviseJspandJSFFiles() throws URISyntaxException, IOException {
+        AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
+        AdvisorLoader advisorLoader = new AdvisorLoader();
+        List<AdvisorBean> advisorBeans = new ArrayList<>();
+        Properties properties = advisorLoader.loadPatterns("10");
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        List<File> files = advisorLoader.loadJSPandJSFFiles(baseDir);
+        
+        advisorEvaluator.adviseJspandJSFFiles(properties, advisorBeans, files);
+        
+        assertTrue(advisorBeans.size() > 0);
+    }
+
+    @Test
+    void adviseConfigFiles() throws IOException {
+        AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
+        AdvisorLoader advisorLoader = new AdvisorLoader();
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        List<File> files = advisorLoader.loadConfigFiles(baseDir);
+        List<AdvisorBean> advisorBeans = new ArrayList<>();
+        
+        advisorEvaluator.adviseConfigFiles(advisorBeans, files);
+        assertTrue(advisorBeans.size() > 0);
+    }
 }
