@@ -37,28 +37,56 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package fish.payara.advisor;
 
-import fish.payara.advisor.AdvisorBean;
 import java.io.File;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BeansXmlTest {
-    
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
-        
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
+class AdvisorLoaderTest {
+
+    @Test
+    void loadPatterns() throws URISyntaxException, IOException {
+        AdvisorLoader loader = new AdvisorLoader();
+        Properties properties = loader.loadPatterns("10");
+        assertNotNull(properties);
+        assertTrue(!properties.isEmpty());
     }
 
+    @Test
+    void loadSourceFiles() throws IOException {
+        AdvisorLoader loader = new AdvisorLoader();
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        
+        List<File> files = loader.loadSourceFiles(baseDir);
+        assertNotNull(files);
+        assertTrue(files.size() > 0);
+    }
+
+    @Test
+    void loadJSPandJSFFiles() throws IOException {
+        AdvisorLoader loader = new AdvisorLoader();
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+        
+        List<File> files = loader.loadJSPandJSFFiles(baseDir);
+        assertNotNull(files);
+        assertTrue(files.size() > 0);
+    }
+
+    @Test
+    void loadConfigFiles() throws IOException {
+        AdvisorLoader loader = new AdvisorLoader();
+        File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
+
+        List<File> files = loader.loadConfigFiles(baseDir);
+        assertNotNull(files);
+        assertTrue(files.size() > 0);
+    }
 }

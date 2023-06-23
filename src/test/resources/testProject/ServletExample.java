@@ -37,28 +37,39 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package servlets;
 
-import fish.payara.advisor.AdvisorBean;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.UnavailableException;
+import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+@WebServlet(name = "ServletExample", value = "/ServletExample")
+public class ServletExample extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ServletContext servletContext = getServletContext();
+        servletContext.getServlet("");
 
-class BeansXmlTest {
-    
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
-        
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
+        servletContext.getServlets();
+
+        servletContext.getServletNames();
+
+        servletContext.log(new Exception(""), "");
     }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRealPath("");
+        UnavailableException unavailableException = new UnavailableException(0, this, "");
+        unavailableException.getServlet();
+        request.isRequestedSessionIdFromUrl();
+        response.encodeUrl("");
+        response.encodeRedirectUrl("");
+        response.setStatus(0, "String");
+    }
 }

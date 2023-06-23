@@ -37,28 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package fish.payara.advisor.config.files;
+package jsonb;
 
-import fish.payara.advisor.AdvisorBean;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import jakarta.json.bind.annotation.JsonbProperty;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class BeansXmlTest {
+public class JsonBeanTest {
     
-    @Test 
-    void adviseBeansXmlFile() {
-        Path resourcePath = Paths.get("src", "test", "resources", "beans.xml");
-        File resourceFile = resourcePath.toFile();
-        assertNotNull(resourceFile);
-        
-        BeansXml beansXml = new BeansXml();
-        List<AdvisorBean> beans = beansXml.analise(resourceFile);
-        assertTrue(beans.size() > 0);
-    }
-
+    @JsonbProperty(nillable = true)
+    private String name;
 }
