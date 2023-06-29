@@ -167,7 +167,7 @@ public class AdvisorMessageProcessor {
     }
 
     public void printToConsole(List<AdvisorBean> advisorMethodBeanList, Log log) {
-        log.info("Showing Advises");
+        log.info("Showing Advisories");
         log.info("***************");
         advisorMethodBeanList.forEach(b -> {
             if(b.getType() != null) {

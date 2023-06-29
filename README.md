@@ -30,7 +30,7 @@ mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:advise
 if a pattern matchs you will see something like the following:
 
 ```
-[INFO] Showing advises
+[INFO] Showing advice
 [INFO] ********
  Jakarta Authorization 2.1
  Issue # 105
