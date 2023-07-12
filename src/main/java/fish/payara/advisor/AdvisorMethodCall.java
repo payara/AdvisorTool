@@ -42,6 +42,7 @@ package fish.payara.advisor;
 import com.github.javaparser.Position;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -115,7 +116,9 @@ public class AdvisorMethodCall implements AdvisorInterface {
         public void visit(MethodDeclaration methodDeclaration, List<AdvisorBean> collector) {
             super.visit(methodDeclaration, collector);
             Optional<Position> p = methodDeclaration.getBegin();
-            if(methodDeclaration.isMethodDeclaration() && methodDeclaration.getDeclarationAsString().contains(valuePattern)) {
+            if(methodDeclaration.isMethodDeclaration() && (params != null && params.length > 0 
+                    && compareParameters(params, methodDeclaration.getParameters()) 
+                    || methodDeclaration.getDeclarationAsString().contains(valuePattern))) {
                 AdvisorBean advisorMethodBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
                         setLine((p.map(position -> "" + position.line).orElse(""))).
                         setMethodDeclaration(methodDeclaration.getDeclarationAsString()).build();
@@ -139,4 +142,19 @@ public class AdvisorMethodCall implements AdvisorInterface {
         }
         return true;
     }
+
+    protected static boolean compareParameters(String[] params, NodeList<Parameter> nodeList) {
+        if (nodeList.size() != params.length) {
+            return false;
+        }
+        for (String param: params) {
+            Optional<Parameter> optionalParameter = nodeList.stream().filter(n -> n.getType().toString().contains(param.trim())).findAny();
+            if(!optionalParameter.isPresent()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
 }
