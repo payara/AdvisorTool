@@ -50,7 +50,7 @@
     <version>1.0</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Payara Jakarta EE 8 to 10 Upgrade Advisor Tool</description>
-    <url>http://www.payara.fish</url>
+    <url>https://github.com/payara/AdvisorTool/</url>
 
     <licenses>
         <license>
