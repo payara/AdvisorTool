@@ -24,7 +24,7 @@ mvn clean install
 Execute Command under a project that you want to advise for jakarta 10
 
 ```
-mvn fish.payara.advisor:advisor-maven-plugin:1.0:advise
+mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:advise
 ```
 
 if a pattern matchs you will see something like the following:
