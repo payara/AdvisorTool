@@ -75,7 +75,7 @@ public class AdvisorMessageProcessor {
         addMessages("config/jakarta" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
     }
 
-    private void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
+    protected void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
         advisorMethodBeanList.forEach(b -> {
             URI baseMessageFolder = null;
             try {
@@ -153,8 +153,8 @@ public class AdvisorMessageProcessor {
         b.setAdvisorMessage(advisorMessage);
     }
     
-    private Properties readProperties(Properties messageProperties, Path p) throws IOException {
-        try(InputStream stream = AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString())) {
+    protected Properties readProperties(Properties messageProperties, Path p) throws IOException {
+        try(InputStream stream = AdvisorMessageProcessor.class.getClassLoader().getResourceAsStream(p.toString())) {
             if(stream == null) {
                 File f = p.toFile();
                 FileInputStream fileInputStream = new FileInputStream(f);
