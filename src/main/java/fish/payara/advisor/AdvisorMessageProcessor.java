@@ -99,9 +99,9 @@ public class AdvisorMessageProcessor {
         String fileFix = null;
         String keyIssue = null;
         Properties messageProperties = new Properties();
-        String subSpec = keyPattern.contains("method") ? "method" : (
+        String subSpec = keyPattern.contains("interface") ? "interface" : (keyPattern.contains("method") ? "method" : (
                 keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": (
-                        keyPattern.contains("namespace") ? "namespace" : "tag")));
+                        keyPattern.contains("namespace") ? "namespace" : "tag"))));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
             fileMessageName = spec + "messages.properties";
