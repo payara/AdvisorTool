@@ -40,7 +40,6 @@
 package fish.payara.advisor.microprofile;
 
 import fish.payara.advisor.AdvisorLoader;
-import fish.payara.advisor.AdvisorToolMojo;
 
 import java.io.File;
 import java.io.FileInputStream;
