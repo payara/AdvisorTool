@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -75,7 +75,7 @@ public class AdvisorMessageProcessor {
         addMessages("config/jakarta" + adviseVersion + "/advisorFix", advisorMethodBeanList, "fix");
     }
 
-    private void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
+    protected void addMessages(String url, List<AdvisorBean> advisorMethodBeanList, String type) {
         advisorMethodBeanList.forEach(b -> {
             URI baseMessageFolder = null;
             try {
@@ -99,9 +99,9 @@ public class AdvisorMessageProcessor {
         String fileFix = null;
         String keyIssue = null;
         Properties messageProperties = new Properties();
-        String subSpec = keyPattern.contains("method") ? "method" : (
+        String subSpec = keyPattern.contains("interface") ? "interface" : (keyPattern.contains("method") ? "method" : (
                 keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": (
-                        keyPattern.contains("namespace") ? "namespace" : "tag")));
+                        keyPattern.contains("namespace") ? "namespace" : "tag"))));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
             fileMessageName = spec + "messages.properties";
@@ -153,8 +153,8 @@ public class AdvisorMessageProcessor {
         b.setAdvisorMessage(advisorMessage);
     }
     
-    private Properties readProperties(Properties messageProperties, Path p) throws IOException {
-        try(InputStream stream = AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString())) {
+    protected Properties readProperties(Properties messageProperties, Path p) throws IOException {
+        try(InputStream stream = AdvisorMessageProcessor.class.getClassLoader().getResourceAsStream(p.toString())) {
             if(stream == null) {
                 File f = p.toFile();
                 FileInputStream fileInputStream = new FileInputStream(f);

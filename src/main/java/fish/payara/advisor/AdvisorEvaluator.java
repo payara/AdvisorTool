@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -87,7 +87,7 @@ public class AdvisorEvaluator {
 
     private void processMethodCall(String value, String key, File sourceFile, List<AdvisorBean> advisorsList) {
         String importNameSpace = value.substring(0, value.indexOf("#"));
-        String methodCall = value.substring(value.indexOf("#") + 1, value.length());
+        String methodCall = value.substring(value.indexOf("#") + 1);
         //search import
         AdvisorBean advisorBean = null;
         AdvisorClassImport acimp = new AdvisorClassImport();
@@ -122,6 +122,10 @@ public class AdvisorEvaluator {
                     } else {
                         advisorBean = amc.parseFile(key, methodCall, sourceFile, args);
                     }
+                } else if (methodCall.contains("->")) {
+                    AdvisorMethodReturn amr = new AdvisorMethodReturn();
+                    String returnType = methodCall.substring(methodCall.indexOf('-' + 2));
+                    advisorBean = amr.parseFile(key, methodCall.split("->")[0], sourceFile, returnType);
                 } else {
                     advisorBean = amc.parseFile(key, methodCall, sourceFile);
                 }

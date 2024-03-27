@@ -27,6 +27,15 @@ Execute Command under a project that you want to advise for jakarta 10
 mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:advise
 ```
 
+Or
+
+Execute Command under a project that you want to advise for microprofile 6
+
+```
+mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:microprofile-advise
+```
+
+
 if a pattern matchs you will see something like the following:
 
 ```
