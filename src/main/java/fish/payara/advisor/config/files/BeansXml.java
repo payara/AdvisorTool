@@ -68,7 +68,7 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
             BeansXml.BeanHandler handler = new BeansXml.BeanHandler();
             saxParser.parse(file, handler);
             ArrayList<BeansXml.Bean> beans = handler.getBeans();
-            if (beans.isEmpty()) {
+            if (beans.isEmpty() && !handler.isAnnotated()) {
                 AdvisorBean advisorFileBean = new AdvisorBean.
                         AdvisorBeanBuilder("jakarta-cdi-file-empty-beans-xml", "empty.beans.xml").
                         setFile(file).
@@ -105,6 +105,8 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
         private final ArrayList<BeansXml.Bean> beans = new ArrayList<>();
         private BeansXml.Bean currentBean;
 
+        private boolean isAnnotated = false;
+
         public BeanHandler() {
         }
 
@@ -112,11 +114,20 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
             return this.beans;
         }
 
+        public boolean isAnnotated() {
+            return this.isAnnotated;
+        }
+
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
             if ("bean".equals(qName)) {
                 String name = attributes.getValue("name");
                 String className = attributes.getValue("class");
                 this.currentBean = new BeansXml.Bean(name, className);
+            } else if ("beans".equals(qName)) {
+                String mode = attributes.getValue("bean-discovery-mode");
+                if ("annotated".equals(mode)) {
+                    this.isAnnotated = true;
+                }
             }
         }
 
