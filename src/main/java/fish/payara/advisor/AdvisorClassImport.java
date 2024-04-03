@@ -72,12 +72,16 @@ public class AdvisorClassImport implements AdvisorInterface {
         public void visit(final ImportDeclaration importDeclaration, final List<AdvisorBean> collector) {
             super.visit(importDeclaration, collector);
             Optional<Position> p = importDeclaration.getBegin();
-            if (importDeclaration.toString().contains(valuePattern)) {
+            if (normalizeImportDeclaration(importDeclaration).endsWith(valuePattern)) {
                 AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern)
                         .setLine((p.map(position -> "" + position.line).orElse("")))
                                 .setImportDeclaration(importDeclaration.getNameAsString()).build();
                 collector.add(advisorBean);
             }
         }
+    }
+
+    private static String normalizeImportDeclaration(ImportDeclaration importDeclaration) {
+        return importDeclaration.toString().split(";")[0];
     }
 }
