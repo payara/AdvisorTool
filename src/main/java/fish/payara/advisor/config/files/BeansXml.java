@@ -125,7 +125,7 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
                 this.currentBean = new BeansXml.Bean(name, className);
             } else if ("beans".equals(qName)) {
                 String mode = attributes.getValue("bean-discovery-mode");
-                if ("annotated".equals(mode)) {
+                if ("all".equals(mode)) {
                     this.isAnnotated = true;
                 }
             }
