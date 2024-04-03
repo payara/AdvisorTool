@@ -75,15 +75,16 @@ class AdvisorMethodCallTest {
         AdvisorMethodCall advisorMethodCall = new AdvisorMethodCall();
         File resourceFile = resourcePath.toFile();
         assertNotNull(resourceFile);
+        String[] methodParameters = {"AuthConfigProvider","String","String","String"};
         
         VoidVisitor<List<AdvisorBean>> expectedVisitor = advisorMethodCall.createVoidVisitor(
                 "jakarta-authentication-method-change-issue-87-case-2-info",
-                "security.auth.message.config.AuthConfigFactory#registerConfigProvider");
+                "security.auth.message.config.AuthConfigFactory#registerConfigProvider", methodParameters);
         assertNotNull(expectedVisitor);
-
+        
         AdvisorBean expectedBean = advisorMethodCall.parseFile(
                 "jakarta-authentication-method-change-issue-87-case-2-info",
-                "registerConfigProvider", resourceFile);
+                "registerConfigProvider", resourceFile, methodParameters);
         assertNotNull(expectedBean);
     }
     

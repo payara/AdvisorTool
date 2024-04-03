@@ -116,9 +116,15 @@ public class AdvisorMethodCall implements AdvisorInterface {
         public void visit(MethodDeclaration methodDeclaration, List<AdvisorBean> collector) {
             super.visit(methodDeclaration, collector);
             Optional<Position> p = methodDeclaration.getBegin();
+            String methodName = null;
+            if(valuePattern.contains("(")) {
+                methodName = valuePattern.substring(0, valuePattern.indexOf("("));
+            } else {
+                methodName = valuePattern;
+            }
             if(methodDeclaration.isMethodDeclaration() && (params != null && params.length > 0 
                     && compareParameters(params, methodDeclaration.getParameters()) 
-                    || methodDeclaration.getDeclarationAsString().contains(valuePattern))) {
+                    && methodDeclaration.getName().asString().trim().contains(methodName.trim()))) {
                 AdvisorBean advisorMethodBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
                         setLine((p.map(position -> "" + position.line).orElse(""))).
                         setMethodDeclaration(methodDeclaration.getDeclarationAsString()).build();
