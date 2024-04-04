@@ -41,6 +41,7 @@
 package fish.payara.advisor.config.files;
 
 import fish.payara.advisor.AdvisorBean;
+import fish.payara.advisor.AdvisorType;
 import fish.payara.advisor.Analyzer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -55,7 +56,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BeansXml implements Analyzer<List<AdvisorBean>> {
+
+    private String keyPattern;
+
     public BeansXml() {
+        this.keyPattern = "jakarta-cdi-file-empty-beans-xml";
+    }
+
+    public BeansXml(String keyPattern) {
+        this.keyPattern = keyPattern;
     }
 
     public List<AdvisorBean> analise(File file) {
@@ -70,9 +79,10 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
             ArrayList<BeansXml.Bean> beans = handler.getBeans();
             if (beans.isEmpty() && !handler.isAnnotated()) {
                 AdvisorBean advisorFileBean = new AdvisorBean.
-                        AdvisorBeanBuilder("jakarta-cdi-file-empty-beans-xml", "empty.beans.xml").
+                        AdvisorBeanBuilder(keyPattern, "empty.beans.xml").
                         setFile(file).
                         setLine("0").
+                        setType(AdvisorType.WARN).
                         setMethodDeclaration("empty beans.xml").build();
                 advisors.add(advisorFileBean);
             }

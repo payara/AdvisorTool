@@ -74,7 +74,7 @@ class AdvisorEvaluatorTest {
         File baseDir = Paths.get("src", "test", "resources", "testProject").toFile();
         List<File> files = advisorLoader.loadJSPandJSFFiles(baseDir);
         
-        advisorEvaluator.adviseJspandJSFFiles(properties, advisorBeans, files);
+        advisorEvaluator.adviseJspAndJSFFiles(properties, advisorBeans, files);
         
         assertTrue(advisorBeans.size() > 0);
     }

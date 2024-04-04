@@ -91,7 +91,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             
             files = advisorLoader.loadJSPandJSFFiles(project.getBasedir());
             if(!files.isEmpty()) {
-                advisorEvaluator.adviseJspandJSFFiles(patterns, advisorBeans, files);
+                advisorEvaluator.adviseJspAndJSFFiles(patterns, advisorBeans, files);
             }
             
             files = advisorLoader.loadConfigFiles(project.getBasedir());

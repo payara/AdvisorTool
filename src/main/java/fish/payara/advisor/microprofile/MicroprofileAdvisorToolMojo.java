@@ -41,8 +41,6 @@ package fish.payara.advisor.microprofile;
 
 import fish.payara.advisor.AdvisorBean;
 import fish.payara.advisor.AdvisorEvaluator;
-import fish.payara.advisor.AdvisorLoader;
-import fish.payara.advisor.AdvisorMessageProcessor;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -96,12 +94,12 @@ public class MicroprofileAdvisorToolMojo extends AbstractMojo {
             
             files = microprofileAdvisorLoader.loadJSPandJSFFiles(project.getBasedir());
             if(!files.isEmpty()) {
-                advisorEvaluator.adviseJspandJSFFiles(patterns, advisorBeans, files);
+                advisorEvaluator.adviseJspAndJSFFiles(patterns, advisorBeans, files);
             }
             
             files = microprofileAdvisorLoader.loadConfigFiles(project.getBasedir());
             if (!files.isEmpty()) {
-                advisorEvaluator.adviseConfigFiles(advisorBeans, files);
+                advisorEvaluator.adviseMPConfigFiles(advisorBeans, files);
             }
             MicroprofileAdvisorMessageProcessor microprofileAdvisorMessageProcessor = new MicroprofileAdvisorMessageProcessor();
             microprofileAdvisorMessageProcessor.updateLogSeverityForMessages(advisorBeans);

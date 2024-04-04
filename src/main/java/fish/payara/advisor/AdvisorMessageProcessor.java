@@ -99,19 +99,19 @@ public class AdvisorMessageProcessor {
         String fileFix = null;
         String keyIssue = null;
         Properties messageProperties = new Properties();
-        String subSpec = keyPattern.contains("interface") ? "interface" : (keyPattern.contains("method") ? "method" : (
-                keyPattern.contains("remove") ? "remove" : (keyPattern.contains("file") ? "file": (
-                        keyPattern.contains("namespace") ? "namespace" : "tag"))));
+        String subSpec = keyPattern.contains("-interface") ? "-interface" : (keyPattern.contains("-method") ? "-method" : (
+                keyPattern.contains("-remove") ? "-remove" : (keyPattern.contains("-file") ? "-file": (
+                        keyPattern.contains("-namespace") ? "-namespace" : "-tag"))));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
-            fileMessageName = spec + "messages.properties";
+            fileMessageName = spec + "-messages.properties";
         }
         if(type.equals("fix")) {
-            fileFix = spec + "fix-messages.properties";
+            fileFix = spec + "-fix-messages.properties";
         }
 
         if (keyPattern.contains("issue")) {
-            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("issue"));
+            keyIssue = spec + keyPattern.substring(keyPattern.indexOf("-issue"));
         }
 
         if (internalPath != null) {

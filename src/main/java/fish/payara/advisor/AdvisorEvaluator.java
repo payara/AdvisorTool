@@ -168,7 +168,7 @@ public class AdvisorEvaluator {
     }
 
 
-    public void adviseJspandJSFFiles(Properties patterns, List<AdvisorBean> advisorBeans, List<File> files) {
+    public void adviseJspAndJSFFiles(Properties patterns, List<AdvisorBean> advisorBeans, List<File> files) {
         Set<Map.Entry> namespaceProperties = patterns.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().contains("namespace-upgrade"))
                 .collect(Collectors.toSet());
@@ -240,6 +240,30 @@ public class AdvisorEvaluator {
         if (beanXmlNotFound) {
             AdvisorBean advisorFileBean = new AdvisorBean.
                     AdvisorBeanBuilder("jakarta-cdi-file-not-found-beans-xml", "not.found.beans.xml").
+                    setMethodDeclaration("not found beans.xml").build();
+            advisorBeans.add(advisorFileBean);
+        }
+    }
+
+    public void adviseMPConfigFiles(List<AdvisorBean> advisorBeans, List<File> files) {
+        Analyzer<List<AdvisorBean>> beanAnalyzer;
+
+        boolean beanXmlNotFound = true;
+        for (File file : files) {
+            if (file.isFile()) {
+                if ("beans.xml".equals(file.getName())) {
+                    beanAnalyzer = new BeansXml("microprofile-cdi-file-empty-beans-xml");
+                    beanXmlNotFound = false;
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                    if (advisorsFromAnalyzer.size() > 0) {
+                        advisorBeans.addAll(advisorsFromAnalyzer);
+                    }
+                }
+            }
+        }
+        if (beanXmlNotFound) {
+            AdvisorBean advisorFileBean = new AdvisorBean.
+                    AdvisorBeanBuilder("microprofile-cdi-file-not-found-beans-xml", "not.found.beans.xml").
                     setMethodDeclaration("not found beans.xml").build();
             advisorBeans.add(advisorFileBean);
         }
