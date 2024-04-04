@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -75,7 +75,26 @@ class AdvisorMethodCallTest {
         AdvisorMethodCall advisorMethodCall = new AdvisorMethodCall();
         File resourceFile = resourcePath.toFile();
         assertNotNull(resourceFile);
+        String[] methodParameters = {"AuthConfigProvider","String","String","String"};
         
+        VoidVisitor<List<AdvisorBean>> expectedVisitor = advisorMethodCall.createVoidVisitor(
+                "jakarta-authentication-method-change-issue-87-case-2-info",
+                "security.auth.message.config.AuthConfigFactory#registerConfigProvider", methodParameters);
+        assertNotNull(expectedVisitor);
+        
+        AdvisorBean expectedBean = advisorMethodCall.parseFile(
+                "jakarta-authentication-method-change-issue-87-case-2-info",
+                "registerConfigProvider", resourceFile, methodParameters);
+        assertNotNull(expectedBean);
+    }
+
+    @Test
+    void createBeanFromParsingFileWithAmbiguousMethodDeclaration() throws FileNotFoundException {
+        Path resourcePath = Paths.get("src", "test", "resources", "TestAuthConfigFactory.java");
+        AdvisorMethodCall advisorMethodCall = new AdvisorMethodCall();
+        File resourceFile = resourcePath.toFile();
+        assertNotNull(resourceFile);
+
         VoidVisitor<List<AdvisorBean>> expectedVisitor = advisorMethodCall.createVoidVisitor(
                 "jakarta-authentication-method-change-issue-87-case-2-info",
                 "security.auth.message.config.AuthConfigFactory#registerConfigProvider");
@@ -84,7 +103,7 @@ class AdvisorMethodCallTest {
         AdvisorBean expectedBean = advisorMethodCall.parseFile(
                 "jakarta-authentication-method-change-issue-87-case-2-info",
                 "registerConfigProvider", resourceFile);
-        assertNotNull(expectedBean);
+        assertNull(expectedBean);
     }
     
     @Test

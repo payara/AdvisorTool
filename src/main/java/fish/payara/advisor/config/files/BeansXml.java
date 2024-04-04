@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -41,6 +41,7 @@
 package fish.payara.advisor.config.files;
 
 import fish.payara.advisor.AdvisorBean;
+import fish.payara.advisor.AdvisorType;
 import fish.payara.advisor.Analyzer;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -55,7 +56,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BeansXml implements Analyzer<List<AdvisorBean>> {
+
+    private String keyPattern;
+
     public BeansXml() {
+        this.keyPattern = "jakarta-cdi-file-empty-beans-xml";
+    }
+
+    public BeansXml(String keyPattern) {
+        this.keyPattern = keyPattern;
     }
 
     public List<AdvisorBean> analise(File file) {
@@ -68,11 +77,12 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
             BeansXml.BeanHandler handler = new BeansXml.BeanHandler();
             saxParser.parse(file, handler);
             ArrayList<BeansXml.Bean> beans = handler.getBeans();
-            if (beans.isEmpty()) {
+            if (beans.isEmpty() && !handler.isAnnotated()) {
                 AdvisorBean advisorFileBean = new AdvisorBean.
-                        AdvisorBeanBuilder("jakarta-cdi-file-empty-beans-xml", "empty.beans.xml").
+                        AdvisorBeanBuilder(keyPattern, "empty.beans.xml").
                         setFile(file).
                         setLine("0").
+                        setType(AdvisorType.WARN).
                         setMethodDeclaration("empty beans.xml").build();
                 advisors.add(advisorFileBean);
             }
@@ -105,6 +115,8 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
         private final ArrayList<BeansXml.Bean> beans = new ArrayList<>();
         private BeansXml.Bean currentBean;
 
+        private boolean isAnnotated = false;
+
         public BeanHandler() {
         }
 
@@ -112,11 +124,20 @@ public class BeansXml implements Analyzer<List<AdvisorBean>> {
             return this.beans;
         }
 
+        public boolean isAnnotated() {
+            return this.isAnnotated;
+        }
+
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
             if ("bean".equals(qName)) {
                 String name = attributes.getValue("name");
                 String className = attributes.getValue("class");
                 this.currentBean = new BeansXml.Bean(name, className);
+            } else if ("beans".equals(qName)) {
+                String mode = attributes.getValue("bean-discovery-mode");
+                if ("all".equals(mode)) {
+                    this.isAnnotated = true;
+                }
             }
         }
 
