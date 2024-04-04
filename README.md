@@ -24,7 +24,7 @@ mvn clean install
 Execute Command under a project that you want to advise for jakarta 10
 
 ```
-mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:advise
+mvn fish.payara.advisor:advisor-maven-plugin:1.1:advise
 ```
 
 Or
@@ -32,7 +32,7 @@ Or
 Execute Command under a project that you want to advise for microprofile 6
 
 ```
-mvn fish.payara.advisor:advisor-maven-plugin:1.0-SNAPSHOT:microprofile-advise
+mvn fish.payara.advisor:advisor-maven-plugin:1.1:microprofile-advise
 ```
 
 

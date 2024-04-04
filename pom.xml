@@ -47,7 +47,7 @@
     <groupId>fish.payara.advisor</groupId>
     <artifactId>advisor-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Payara Jakarta EE 8 to 10 Upgrade Advisor Tool</description>
     <url>https://github.com/payara/AdvisorTool/</url>
