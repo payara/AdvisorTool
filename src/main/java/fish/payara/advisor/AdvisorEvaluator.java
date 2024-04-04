@@ -240,7 +240,7 @@ public class AdvisorEvaluator {
         if (beanXmlNotFound) {
             AdvisorBean advisorFileBean = new AdvisorBean.
                     AdvisorBeanBuilder("jakarta-cdi-file-not-found-beans-xml", "not.found.beans.xml").
-                    setMethodDeclaration("not found beans.xml").build();
+                    setMethodDeclaration("not found beans.xml").setType(AdvisorType.WARN).build();
             advisorBeans.add(advisorFileBean);
         }
     }
