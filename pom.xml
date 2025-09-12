@@ -47,9 +47,9 @@
     <groupId>fish.payara.advisor</groupId>
     <artifactId>advisor-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>1.1</version>
+    <version>2.0-SNAPSHOT</version>
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Payara Jakarta EE 8 to 10 Upgrade Advisor Tool</description>
+    <description>Payara Jakarta EE 8 to 10, 11 Upgrade Advisor Tool</description>
     <url>https://github.com/payara/AdvisorTool/</url>
 
     <licenses>
@@ -134,7 +134,7 @@
         <dependency>
             <groupId>com.github.javaparser</groupId>
             <artifactId>javaparser-symbol-solver-core</artifactId>
-            <version>3.25.2</version>
+            <version>3.27.0</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
