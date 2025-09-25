@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -64,9 +64,10 @@ import org.apache.maven.project.MavenProject;
 public class AdvisorLoader {
 
     private static final Logger log = Logger.getLogger(AdvisorLoader.class.getName());
+
     public Properties loadPatterns(String version) throws URISyntaxException, IOException {
         //validate configurations
-        if(AdvisorToolMojo.class.getClassLoader().getResource("config/jakarta"+version) == null) {
+        if (AdvisorToolMojo.class.getClassLoader().getResource("config/jakarta" + version) == null) {
             log.severe(String.format("Not available configurations for the indicated version %s", version));
             return null;
         }
@@ -74,18 +75,18 @@ public class AdvisorLoader {
                 "config/jakarta" + version + "/mappedPatterns")).toURI();
         Properties readPatterns = new Properties();
         Path internalPath = null;
-        if(uriBaseFolder.getScheme().equals("jar")) {
+        if (uriBaseFolder.getScheme().equals("jar")) {
             FileSystem fileSystem = FileSystems.newFileSystem(uriBaseFolder, Collections.<String, Object>emptyMap());
-            internalPath = fileSystem.getPath("config/jakarta"+version+"/mappedPatterns");
+            internalPath = fileSystem.getPath("config/jakarta" + version + "/mappedPatterns");
         } else {
             internalPath = Paths.get(uriBaseFolder);
         }
         Stream<Path> walk = Files.walk(internalPath, 1);
-        for (Iterator<Path> it = walk.iterator(); it.hasNext();){
+        for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
             Path p = it.next();
-            if(p.getFileName().toString().contains(".properties")) {
-                try(InputStream stream = AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString())) {
-                    if(stream == null) {
+            if (p.getFileName().toString().contains(".properties")) {
+                try (InputStream stream = AdvisorToolMojo.class.getClassLoader().getResourceAsStream(p.toString())) {
+                    if (stream == null) {
                         File f = p.toFile();
                         FileInputStream fileInputStream = new FileInputStream(f);
                         readPatterns.load(fileInputStream);
@@ -99,8 +100,8 @@ public class AdvisorLoader {
     }
 
     public List<File> loadSourceFiles(File baseDir) throws IOException {
-        List<File>javaFiles = new ArrayList<>();
-        if(baseDir != null) {
+        List<File> javaFiles = new ArrayList<>();
+        if (baseDir != null) {
             javaFiles = Files.walk(Paths.get(baseDir.toURI()))
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
@@ -113,10 +114,10 @@ public class AdvisorLoader {
 
     public List<File> loadJSPandJSFFiles(File baseDir) throws IOException {
         List<File> jspFiles = new ArrayList<>();
-        if(baseDir != null) {
+        if (baseDir != null) {
             jspFiles = Files.walk(Paths.get(baseDir.toURI()))
                     .filter(Files::isRegularFile)
-                    .filter(p->p.toString().endsWith(".jsp") || p.toString().endsWith(".xhtml"))
+                    .filter(p -> p.toString().endsWith(".jsp") || p.toString().endsWith(".xhtml"))
                     .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
@@ -126,7 +127,7 @@ public class AdvisorLoader {
 
     public List<File> loadConfigFiles(File baseDir) throws IOException {
         List<File> configFiles = new ArrayList<>();
-        if(baseDir != null) {
+        if (baseDir != null) {
             configFiles = Files.walk(Paths.get(baseDir.toURI()))
                     .filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".xml")
                             || p.toString().endsWith(".properties"))
@@ -136,5 +137,5 @@ public class AdvisorLoader {
         }
         return configFiles;
     }
-    
+
 }

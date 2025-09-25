@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,12 +56,12 @@ import org.apache.maven.project.MavenProject;
 public class AdvisorToolMojo extends AbstractMojo {
 
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
-    
+
     private static final String ADVISE_VERSION = "adviseVersion";
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
+    @Parameter(property = "advisor-plugin.adviseVersion", required = false, defaultValue = "10")
     private String adviseVersion;
 
     @Override
@@ -71,7 +71,7 @@ public class AdvisorToolMojo extends AbstractMojo {
         Properties properties = System.getProperties();
         AdvisorLoader advisorLoader = new AdvisorLoader();
         AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
-        if(properties.getProperty(ADVISE_VERSION) != null) {
+        if (properties.getProperty(ADVISE_VERSION) != null) {
             this.adviseVersion = properties.getProperty(ADVISE_VERSION);
         }
         try {
@@ -88,12 +88,12 @@ public class AdvisorToolMojo extends AbstractMojo {
                     advisorBeans = advisorEvaluator.adviseCode(patterns, files);
                 }
             }
-            
+
             files = advisorLoader.loadJSPandJSFFiles(project.getBasedir());
-            if(!files.isEmpty()) {
+            if (!files.isEmpty()) {
                 advisorEvaluator.adviseJspAndJSFFiles(patterns, advisorBeans, files);
             }
-            
+
             files = advisorLoader.loadConfigFiles(project.getBasedir());
             if (!files.isEmpty()) {
                 advisorEvaluator.adviseConfigFiles(advisorBeans, files);
@@ -108,7 +108,7 @@ public class AdvisorToolMojo extends AbstractMojo {
             throw new RuntimeException(e);
         }
     }
-    
+
     public void setAdviseVersion(String adviseVersion) {
         this.adviseVersion = adviseVersion;
     }
