@@ -94,7 +94,7 @@ public class AdvisorEvaluator {
         try {
             advisorBean = acimp.parseFile(key, importNameSpace, sourceFile);
             //check if method call
-            if(advisorBean != null) {
+            if(advisorBean != null || importNameSpace.contains("System")) {
                 AdvisorMethodCall amc = new AdvisorMethodCall();
                 String args = "";
                 if (methodCall.contains("(") && methodCall.contains(")")) {
