@@ -139,14 +139,45 @@ public class AdvisorMethodCall implements AdvisorInterface {
         }
         for (int i = 0; i < nodeList.size(); i++) {
             Expression argument = nodeList.get(i);
-            if (argument instanceof ObjectCreationExpr) {
-                ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
-                if (!type.getName().asString().equals(params[i])) {
-                    return false;
-                }
+            String expectedType = params[i].trim();
+            String actualType = inferArgumentType(argument);
+
+            if (actualType != null && !actualType.equals(expectedType)) {
+                return false;
             }
         }
         return true;
+    }
+
+    private static String inferArgumentType(Expression argument) {
+        if (argument instanceof ObjectCreationExpr) {
+            ClassOrInterfaceType type = ((ObjectCreationExpr) argument).getType();
+            return type.getName().asString();
+        } else if (argument.isStringLiteralExpr()) {
+            return "String";
+        } else if (argument.isIntegerLiteralExpr()) {
+            return "int";
+        } else if (argument.isLongLiteralExpr()) {
+            return "long";
+        } else if (argument.isDoubleLiteralExpr()) {
+            return "double";
+        } else if (argument.isBooleanLiteralExpr()) {
+            return "boolean";
+        } else if (argument.isCharLiteralExpr()) {
+            return "char";
+        } else if (argument.isNullLiteralExpr()) {
+            return null; // null can be any object type
+        } else if (argument.isNameExpr()) {
+            // Variable reference - we can't determine type without more context
+            // For now, we'll accept it as matching
+            return null;
+        } else if (argument.isMethodCallExpr()) {
+            // Method call - we can't determine return type without more analysis
+            // For now, we'll accept it as matching
+            return null;
+        }
+        // For other expression types, return null to accept them
+        return null;
     }
 
     protected static boolean compareParameters(String[] params, NodeList<Parameter> nodeList) {
