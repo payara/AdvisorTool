@@ -42,7 +42,7 @@ package fish.payara.advisor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -58,16 +58,17 @@ public class AdvisorToolMojo extends AbstractMojo {
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
 
     private static final String ADVISE_VERSION = "adviseVersion";
+    
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
-    private MavenProject project;
+    private MavenProject projectConfig;
 
-    @Parameter(property = "advisor-plugin.adviseVersion", required = false, defaultValue = "10")
+    @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
 
     @Override
     public void execute() {
-        Properties patterns = null;
-        List<AdvisorBean> advisorBeans = Collections.emptyList();
+        Properties patterns;
+        List<AdvisorBean> advisorBeans = new ArrayList();
         Properties properties = System.getProperties();
         AdvisorLoader advisorLoader = new AdvisorLoader();
         AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
@@ -82,19 +83,19 @@ public class AdvisorToolMojo extends AbstractMojo {
                 return;
             }
 
-            List<File> files = advisorLoader.loadSourceFiles(project.getBasedir());
+            List<File> files = advisorLoader.loadSourceFiles(projectConfig.getBasedir());
             if (!files.isEmpty()) {
                 if (patterns != null && !patterns.isEmpty()) {
                     advisorBeans = advisorEvaluator.adviseCode(patterns, files);
                 }
             }
 
-            files = advisorLoader.loadJSPandJSFFiles(project.getBasedir());
+            files = advisorLoader.loadJSPandJSFFiles(projectConfig.getBasedir());
             if (!files.isEmpty()) {
                 advisorEvaluator.adviseJspAndJSFFiles(patterns, advisorBeans, files);
             }
 
-            files = advisorLoader.loadConfigFiles(project.getBasedir());
+            files = advisorLoader.loadConfigFiles(projectConfig.getBasedir());
             if (!files.isEmpty()) {
                 advisorEvaluator.adviseConfigFiles(advisorBeans, files);
             }
@@ -108,13 +109,4 @@ public class AdvisorToolMojo extends AbstractMojo {
             throw new RuntimeException(e);
         }
     }
-
-    public void setAdviseVersion(String adviseVersion) {
-        this.adviseVersion = adviseVersion;
-    }
-
-    public String getAdviseVersion() {
-        return adviseVersion;
-    }
-
 }
