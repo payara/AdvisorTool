@@ -40,8 +40,10 @@
 package fish.payara.advisor;
 
 import fish.payara.advisor.config.files.BeansXml;
+import fish.payara.advisor.config.files.JSFEventsConfigXml;
 import fish.payara.advisor.config.files.JaxWsProperties;
 import fish.payara.advisor.config.files.JaxmProperties;
+import fish.payara.advisor.config.files.JSFParamConfigXml;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -234,6 +236,14 @@ public class AdvisorEvaluator {
                     if (!advisorBeans.containsAll(advisorsFromAnalyzer)) {
                         advisorBeans.addAll(advisorsFromAnalyzer);
                     }
+                } else if ("web.xml".equals(file.getName())) {
+                    beanAnalyzer = new JSFParamConfigXml();
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                    advisorBeans.addAll(advisorsFromAnalyzer);
+                } else if ("faces-config.xml".equals(file.getName())) {
+                    beanAnalyzer = new JSFEventsConfigXml();
+                    List<AdvisorBean> advisorsFromAnalyzer = beanAnalyzer.analise(file);
+                    advisorBeans.addAll(advisorsFromAnalyzer);
                 }
             }
         }
