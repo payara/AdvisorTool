@@ -107,6 +107,8 @@ public class AdvisorToolMojo extends AbstractMojo {
             advisorMessageProcessor.printToConsole(advisorBeans, this.getLog());
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
