@@ -60,6 +60,8 @@ public class JSFParamConfigXml implements Analyzer<List<AdvisorBean>> {
     public JSFParamConfigXml() {
         keyPatterns.add("jakarta-faces-remove-property-fss1-xml");
         keyPatterns.add("jakarta-faces-remove-property-fss2-xml");
+        keyPatterns.add("jakarta-faces-remove-constant-default-suffix-param-name-xml");
+        keyPatterns.add("jakarta-faces-remove-constant-default-suffix-xml");
     }
 
     public JSFParamConfigXml(List<String> keyPatterns) {
@@ -81,6 +83,10 @@ public class JSFParamConfigXml implements Analyzer<List<AdvisorBean>> {
                 int idKeyPattern = 0;
                 if (jsfProperty.value().equals("jakarta.faces.FULL_STATE_SAVING_VIEW_IDS_PARAM_NAME")) {
                     idKeyPattern = 1;
+                } else if (jsfProperty.value().equals("jakarta.faces.DEFAULT_SUFFIX_PARAM_NAME")) {
+                    idKeyPattern = 2;
+                } else if (jsfProperty.value().equals("jakarta.faces.DEFAULT_SUFFIX")) {
+                    idKeyPattern = 3;
                 }
 
                 AdvisorBean advisorFileBean = new AdvisorBean.
