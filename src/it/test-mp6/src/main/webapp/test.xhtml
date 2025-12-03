@@ -1,0 +1,84 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                template="/WEB-INF/layout/template.xhtml">
+
+    <ui:define name="content">
+        <h3>Test</h3>
+        <p>Represents tests performed on samples.</p>
+        <h:panelGrid columns="2" columnClasses="label,value" styleClass="table-form">
+
+            <h:outputLabel for="name" value="Name:" />
+            <h:inputText id="name" value="#{testBean.test.name}" />
+
+            <h:outputLabel for="method" value="Method:" />
+            <h:inputText id="method" value="#{testBean.test.method}" />
+
+            <h:outputLabel for="equipment" value="Equipment:" />
+            <h:inputText id="equipment" value="#{testBean.test.equipment}" />
+
+            <h:outputLabel for="analyst" value="Analyst:" />
+            <h:selectOneMenu id="analyst"
+                             value="#{testBean.test.analyst}"
+                             converter="labAnalystConverter">
+                <f:selectItem itemLabel="Select Analyst" noSelectionOption="true" />
+                <f:selectItems value="#{labAnalystBean.allLabAnalysts}"
+                               var="analyst"
+                               itemValue="#{analyst}"
+                               itemLabel="#{analyst}" />
+            </h:selectOneMenu>
+
+            <h:outputLabel for="sample" value="Sample:" />
+            <h:selectOneMenu id="sample"
+                             value="#{testBean.test.sample}"
+                             converter="sampleConverter">
+                <f:selectItem itemLabel="Select Sample" noSelectionOption="true" />
+                <f:selectItems value="#{sampleBean.allSamples}"
+                               var="sample"
+                               itemValue="#{sample}"
+                               itemLabel="#{sample}" />
+            </h:selectOneMenu>
+        </h:panelGrid>
+        <h:inputHidden id="testId" 
+                       value="#{testBean.test.testId}" />
+
+        <h:commandButton value="Save" action="#{testBean.save}" styleClass="btn btn-primary mt-3" />
+
+        <h3 class="mt-5">Test List</h3>
+        <h:dataTable value="#{testBean.allTests}" var="test" border="1" styleClass="table table-striped table-bordered">
+            <h:column>
+                <f:facet name="header">Test Id</f:facet>
+                #{test.testId}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                #{test.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Method</f:facet>
+                #{test.method}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Equipment</f:facet>
+                #{test.equipment}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Analyst</f:facet>
+                #{test.analyst}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Sample</f:facet>
+                #{test.sample}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandLink value="Edit" action="#{testBean.edit(test)}" styleClass="btn btn-link p-0" />
+                |
+                <h:commandLink value="Delete" action="#{testBean.remove(test.testId)}"
+                               onclick="return confirm('Delete this test?');" 
+                               styleClass="btn btn-link p-0 text-danger" />
+            </h:column>
+        </h:dataTable>
+    </ui:define>
+</ui:composition>

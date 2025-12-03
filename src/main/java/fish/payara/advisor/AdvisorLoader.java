@@ -102,10 +102,11 @@ public class AdvisorLoader {
     public List<File> loadSourceFiles(File baseDir) throws IOException {
         List<File> javaFiles = new ArrayList<>();
         if (baseDir != null) {
+            Path projectTarget = Paths.get(baseDir.getAbsolutePath(), "target");
             javaFiles = Files.walk(Paths.get(baseDir.toURI()))
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
-                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
+                    .filter(p -> !p.toAbsolutePath().startsWith(projectTarget))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
@@ -115,10 +116,11 @@ public class AdvisorLoader {
     public List<File> loadJSPandJSFFiles(File baseDir) throws IOException {
         List<File> jspFiles = new ArrayList<>();
         if (baseDir != null) {
+            Path projectTarget = Paths.get(baseDir.getAbsolutePath(), "target");
             jspFiles = Files.walk(Paths.get(baseDir.toURI()))
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".jsp") || p.toString().endsWith(".xhtml"))
-                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
+                    .filter(p -> !p.toAbsolutePath().startsWith(projectTarget))
                     .map(Path::toFile)
                     .collect(Collectors.toList());
         }
@@ -128,12 +130,13 @@ public class AdvisorLoader {
     public List<File> loadConfigFiles(File baseDir) throws IOException {
         List<File> configFiles = new ArrayList<>();
         if (baseDir != null) {
+            Path projectTarget = Paths.get(baseDir.getAbsolutePath(), "target");
             configFiles = Files.walk(Paths.get(baseDir.toURI()))
-                    .filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".xml")
-                            || p.toString().endsWith(".properties"))
-                    .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
+                .filter(Files::isRegularFile)
+                .filter(p -> p.toString().endsWith(".xml") || p.toString().endsWith(".properties"))
+                .filter(p -> !p.toAbsolutePath().startsWith(projectTarget))
+                .map(Path::toFile)
+                .collect(Collectors.toList());
         }
         return configFiles;
     }

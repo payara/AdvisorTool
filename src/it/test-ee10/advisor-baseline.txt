@@ -1,0 +1,8 @@
+[INFO] Showing Advisories
+[INFO] ***************
+[INFO] Line of code: 37 | Expression: javax.persistence.EntityManager
+Source file: ExampleDeprecatedAPI.java
+Jakarta Persistence 3.1
+ EntityManager interface now implements AutoCloseable.
+This issue won't affect your application.
+ Now you can use try-with-resources when calling EntityManager to improve resources usage.

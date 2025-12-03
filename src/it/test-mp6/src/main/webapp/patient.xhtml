@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                template="/WEB-INF/layout/template.xhtml">
+
+    <ui:define name="content">
+        <h3>Patient</h3>
+        <p>Represents patients providing samples for testing.</p>
+        <h:panelGrid columns="2" columnClasses="label,value" styleClass="table-form">
+
+            <h:outputLabel for="name" value="Name:" />
+            <h:inputText id="name" value="#{patientBean.patient.name}" />
+
+            <h:outputLabel for="dob" value="Dob:" />
+            <h:inputText id="dob" value="#{patientBean.patient.dob}" />
+
+            <h:outputLabel for="gender" value="Gender:" />
+            <h:inputText id="gender" value="#{patientBean.patient.gender}" />
+        </h:panelGrid>
+        <h:inputHidden id="patientId" 
+                       value="#{patientBean.patient.patientId}" />
+
+        <h:commandButton value="Save" action="#{patientBean.save}" styleClass="btn btn-primary mt-3" />
+
+        <h3 class="mt-5">Patient List</h3>
+        <h:dataTable value="#{patientBean.allPatients}" var="patient" border="1" styleClass="table table-striped table-bordered">
+            <h:column>
+                <f:facet name="header">Patient Id</f:facet>
+                #{patient.patientId}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                #{patient.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Dob</f:facet>
+                #{patient.dob}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Gender</f:facet>
+                #{patient.gender}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandLink value="Edit" action="#{patientBean.edit(patient)}" styleClass="btn btn-link p-0" />
+                |
+                <h:commandLink value="Delete" action="#{patientBean.remove(patient.patientId)}"
+                               onclick="return confirm('Delete this patient?');" 
+                               styleClass="btn btn-link p-0 text-danger" />
+            </h:column>
+        </h:dataTable>
+    </ui:define>
+</ui:composition>

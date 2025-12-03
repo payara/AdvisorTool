@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                template="/WEB-INF/layout/template.xhtml">
+
+    <ui:define name="content">
+        <h3>Result</h3>
+        <p>Represents test results for samples.</p>
+        <h:panelGrid columns="2" columnClasses="label,value" styleClass="table-form">
+
+            <h:outputLabel for="value" value="Value:" />
+            <h:inputText id="value" value="#{resultBean.result.value}" />
+
+            <h:outputLabel for="unit" value="Unit:" />
+            <h:inputText id="unit" value="#{resultBean.result.unit}" />
+
+            <h:outputLabel for="dateRecorded" value="Date Recorded:" />
+            <h:inputText id="dateRecorded" 
+                         value="#{resultBean.result.dateRecorded}" 
+                         converter="localDateConverter">
+                <f:passThroughAttribute name="type" value="date" />
+            </h:inputText>
+        </h:panelGrid>
+        <h:inputHidden id="resultId" 
+                       value="#{resultBean.result.resultId}" />
+
+        <h:commandButton value="Save" action="#{resultBean.save}" styleClass="btn btn-primary mt-3" />
+
+        <h3 class="mt-5">Result List</h3>
+        <h:dataTable value="#{resultBean.allResults}" var="result" border="1" styleClass="table table-striped table-bordered">
+            <h:column>
+                <f:facet name="header">Result Id</f:facet>
+                #{result.resultId}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Value</f:facet>
+                #{result.value}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Unit</f:facet>
+                #{result.unit}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Date Recorded</f:facet>
+                #{result.dateRecorded}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandLink value="Edit" action="#{resultBean.edit(result)}" styleClass="btn btn-link p-0" />
+                |
+                <h:commandLink value="Delete" action="#{resultBean.remove(result.resultId)}"
+                               onclick="return confirm('Delete this result?');" 
+                               styleClass="btn btn-link p-0 text-danger" />
+            </h:column>
+        </h:dataTable>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,47 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:f="jakarta.faces.core"
+                xmlns:h="jakarta.faces.html"
+                template="/WEB-INF/layout/template.xhtml">
+
+    <ui:define name="content">
+        <h3>Lab Manager</h3>
+        <p>Represents managers supervising lab operations.</p>
+        <h:panelGrid columns="2" columnClasses="label,value" styleClass="table-form">
+
+            <h:outputLabel for="name" value="Name:" />
+            <h:inputText id="name" value="#{labManagerBean.labmanager.name}" />
+
+            <h:outputLabel for="department" value="Department:" />
+            <h:inputText id="department" value="#{labManagerBean.labmanager.department}" />
+        </h:panelGrid>
+        <h:inputHidden id="managerId" 
+                       value="#{labManagerBean.labmanager.managerId}" />
+
+        <h:commandButton value="Save" action="#{labManagerBean.save}" styleClass="btn btn-primary mt-3" />
+
+        <h3 class="mt-5">Lab Manager List</h3>
+        <h:dataTable value="#{labManagerBean.allLabmanagers}" var="labmanager" border="1" styleClass="table table-striped table-bordered">
+            <h:column>
+                <f:facet name="header">Manager Id</f:facet>
+                #{labmanager.managerId}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Name</f:facet>
+                #{labmanager.name}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Department</f:facet>
+                #{labmanager.department}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandLink value="Edit" action="#{labManagerBean.edit(labmanager)}" styleClass="btn btn-link p-0" />
+                |
+                <h:commandLink value="Delete" action="#{labManagerBean.remove(labmanager.managerId)}"
+                               onclick="return confirm('Delete this labmanager?');" 
+                               styleClass="btn btn-link p-0 text-danger" />
+            </h:column>
+        </h:dataTable>
+    </ui:define>
+</ui:composition>

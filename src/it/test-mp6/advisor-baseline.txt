@@ -1,0 +1,12 @@
+[INFO] Showing Advisories
+[INFO] ***************
+[ERROR] Line of code: 28 | Expression: org.eclipse.microprofile.metrics.annotation.Metered
+Source file: Mp4LegacyResource.java
+Microprofile Metrics 5.0
+ org.eclipse.microprofile.metrics.annotation.Metered annotation was REMOVED;
+Your application won't work, please remove Metered annotation because it will not compile in Microprofile 6.
+[ERROR] Line of code: 14 | Expression: org.eclipse.microprofile.opentracing.Traced
+Source file: Mp4LegacyResource.java
+Microprofile OpenTracing was replaced by OpenTelemetry
+ annotation @Traced cannot be used;
+Your application won't work, please replace annotation @Traced with @WithSpan;
