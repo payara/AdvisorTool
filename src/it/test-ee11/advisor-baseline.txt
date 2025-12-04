@@ -1,149 +1,148 @@
 [INFO] Showing Advisories
 [INFO] ***************
-[ERROR] Line of code: 155 | Expression: System.getSecurityManager()
+[ERROR] Line of code: 194 | Expression: System.getSecurityManager()
 Source file: EE11Compatibility.java
-Jakarta Authorization 3.0 
+Jakarta Authorization 3.0
  Since Jakarta Authorization 3.0 all references for Security Manager were removed.
-Your application won't work, 
+Your application won't work,
  please remove System#getSecurityManager method because it will not compile in Jakarta EE 11.
-[ERROR] Line of code: 130 | Expression: c.getComment()
+[ERROR] Line of code: 169 | Expression: c.getComment()
 Source file: EE11Compatibility.java
-Jakarta Servlet 6.1 
- The method Cookie.getComment() is terminally deprecated and marked for removal. 
+Jakarta Servlet 6.1
+ The method Cookie.getComment() is terminally deprecated and marked for removal.
  This method is no longer required with RFC 6265.
-Your application will not work in future releases. 
- Remove all calls to Cookie.getComment(). 
- Cookie comments are not supported in RFC 6265 and should not be used. 
+Your application will not work in future releases.
+ Remove all calls to Cookie.getComment().
+ Cookie comments are not supported in RFC 6265 and should not be used.
  If you need to store metadata about cookies, consider using a separate storage mechanism.
-[WARNING] Line of code: 57 | Expression: ViewHandler.DEFAULT_SUFFIX
+[WARNING] Line of code: 96 | Expression: ViewHandler.DEFAULT_SUFFIX
 Source file: EE11Compatibility.java
-Jakarta Faces 4.1 
+Jakarta Faces 4.1
  since Jakarta Faces 4.1 the constant value DEFAULT_SUFFIX was marked for deprecation and removal.
-This issue won't affect your application. 
- But it is recommended to stop usage of this constant because will be removed on future releases. 
+This issue won't affect your application.
+ But it is recommended to stop usage of this constant because will be removed on future releases.
  You can substitute with the following constant: jakarta.faces.application.ViewHandler.DEFAULT_FACELETS_SUFFIX.
-[WARNING] Line of code: 61 | Expression: q.setParameter(1, new java.util.Date(), TemporalType.DATE)
+[WARNING] Line of code: 100 | Expression: q.setParameter(1, new java.util.Date(), TemporalType.DATE)
 Source file: EE11Compatibility.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.
-[WARNING] Line of code: 135 | Expression: new NewCookie("name", "value", "path", "domain", 0, "comment", 0, new java.util.Date(), false, false)
+[WARNING] Line of code: 174 | Expression: new NewCookie("name", "value", "path", "domain", 0, "comment", 0, new java.util.Date(), false, false)
 Source file: EE11Compatibility.java
-Jakarta RESTful Web Services 4.0 
+Jakarta RESTful Web Services 4.0
  All NewCookie constructors are deprecated and will be removed in a future version. Use NewCookie.Builder instead to create NewCookie instances.
-Replace the deprecated NewCookie constructor with NewCookie.Builder. 
+Replace the deprecated NewCookie constructor with NewCookie.Builder.
  Example: 'new NewCookie.Builder(name).value(value).path(path).domain(domain).version(version).comment(comment).maxAge(maxAge).expiry(expiry).secure(secure).httpOnly(httpOnly).build()'.
-[WARNING] Line of code: 14 | Expression: jakarta.persistence.TemporalType
+[WARNING] Line of code: 53 | Expression: jakarta.persistence.TemporalType
 Source file: EE11Compatibility.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.
-[ERROR] Line of code: 149 | Expression: Persistence.PERSISTENCE_PROVIDER
+[ERROR] Line of code: 188 | Expression: Persistence.PERSISTENCE_PROVIDER
 Source file: EE11Compatibility.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this constant from Persistence class was deprecated and marked for removal.
-Your application won't work, 
+Your application won't work,
  please remove the usage of this constant. This class is not designed for extensibility.
-[ERROR] Line of code: 20 | Expression: jakarta.annotation.ManagedBean
+[ERROR] Line of code: 59 | Expression: jakarta.annotation.ManagedBean
 Source file: EE11Compatibility.java
-Jakarta Annotations 3.0 issue 114 
+Jakarta Annotations 3.0 issue 114
  Since 3.0 the annotation jakarta.annotation.ManagedBean was removed.
-Your application won't work, 
- please remove annotation jakarta.annotation.ManagedBean and replace with 
+Your application won't work,
+ please remove annotation jakarta.annotation.ManagedBean and replace with
  CDI scopes and naming.
-[WARNING] Line of code: 13 | Expression: jakarta.persistence.Temporal
+[WARNING] Line of code: 52 | Expression: jakarta.persistence.Temporal
 Source file: EE11Compatibility.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.
-[ERROR] Line of code: 142 | Expression: bm2.wrapExpressionFactory((ExpressionFactory) null)
+[ERROR] Line of code: 181 | Expression: bm2.wrapExpressionFactory((ExpressionFactory) null)
 Source file: EE11Compatibility.java
-Jakarta CDI 4.1 
+Jakarta CDI 4.1
  since Jakarta CDI 4.1 this method was marked for deprecation and removal.
-Your application won't work. 
- Please remove all calls to jakarta.enterprise.inject.spi.BeanManager.wrapExpressionFactory(ExpressionFactory var). 
- To substitute use the same method from jakarta.enterprise.inject.spi.el.ELAwareBeanManager.wrapExpressionFactory(ExpressionFactory var) 
+Your application won't work.
+ Please remove all calls to jakarta.enterprise.inject.spi.BeanManager.wrapExpressionFactory(ExpressionFactory var).
+ To substitute use the same method from jakarta.enterprise.inject.spi.el.ELAwareBeanManager.wrapExpressionFactory(ExpressionFactory var)
  from the artifact cdi-el-api.jar
-[ERROR] Line of code: 50 | Expression: bm.getELResolver()
+[ERROR] Line of code: 89 | Expression: bm.getELResolver()
 Source file: EE11Compatibility.java
-Jakarta CDI 4.1 
+Jakarta CDI 4.1
  since Jakarta CDI 4.1 this method was marked for deprecation and removal.
-Your application won't work. 
- Please remove all calls to jakarta.enterprise.inject.spi.BeanManager.getELResolver(). 
- To substitute use the same method from jakarta.enterprise.inject.spi.el.ELAwareBeanManager.getELResolver from the artifact 
-cdi-el-api.jar
-[WARNING] Line of code: 69 | Expression: cq.multiselect(selections)
+Your application won't work.
+ Please remove all calls to jakarta.enterprise.inject.spi.BeanManager.getELResolver().
+ To substitute use the same method from jakarta.enterprise.inject.spi.el.ELAwareBeanManager.getELResolver from the artifact cdi-el-api.jar
+[WARNING] Line of code: 108 | Expression: cq.multiselect(selections)
 Source file: EE11Compatibility.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this method was marked for deprecation.
-This issue won't affect your application.  
+This issue won't affect your application.
  But it is recommended to substitute with array or tuple method defined in CriteriaBuilder.
-[WARNING] Line of code: 134 | Expression: new NewCookie("name", "value")
+[WARNING] Line of code: 173 | Expression: new NewCookie("name", "value")
 Source file: EE11Compatibility.java
-Jakarta RESTful Web Services 4.0 
+Jakarta RESTful Web Services 4.0
  All NewCookie constructors are deprecated and will be removed in a future version. Use NewCookie.Builder instead to create NewCookie instances.
-Replace 'new NewCookie(name, value)' with the NewCookie.Builder pattern. 
+Replace 'new NewCookie(name, value)' with the NewCookie.Builder pattern.
  Example: 'new NewCookie.Builder(name).value(value).build()'.
-[WARNING] Line of code: 54 | Expression: ResourceHandler.JSF_SCRIPT_RESOURCE_NAME
+[WARNING] Line of code: 93 | Expression: ResourceHandler.JSF_SCRIPT_RESOURCE_NAME
 Source file: EE11Compatibility.java
-Jakarta Faces 4.1 
+Jakarta Faces 4.1
  since Jakarta Faces 4.1 the constant value ResourceHandler.JSF_SCRIPT_RESOURCE_NAME was marked for deprecation and removal.
-This issue won't affect your application. 
- But it is recommended to stop usage of this constant because will be removed on future releases. 
+This issue won't affect your application.
+ But it is recommended to stop usage of this constant because will be removed on future releases.
  You can substitute with the following constant: jakarta.faces.application.ResourceHandler.FACES_SCRIPT_RESOURCE_NAME
-[WARNING] Line of code: 53 | Expression: ResourceHandler.JSF_SCRIPT_LIBRARY_NAME
+[WARNING] Line of code: 92 | Expression: ResourceHandler.JSF_SCRIPT_LIBRARY_NAME
 Source file: EE11Compatibility.java
-Jakarta Faces 4.1 
- since Jakarta Faces 4.1 the constant value ResourceHandler.JSF_SCRIPT_LIBRARY_NAME was marked for deprecation and removal. 
-This issue won't affect your application. 
- But it is recommended to stop usage of this constant because will be removed on future releases. 
+Jakarta Faces 4.1
+ since Jakarta Faces 4.1 the constant value ResourceHandler.JSF_SCRIPT_LIBRARY_NAME was marked for deprecation and removal.
+This issue won't affect your application.
+ But it is recommended to stop usage of this constant because will be removed on future releases.
  You can substitute with the following constant: jakarta.faces.application.ResourceHandler.FACES_SCRIPT_LIBRARY_NAME.
-[ERROR] Line of code: 131 | Expression: c.getVersion()
+[ERROR] Line of code: 170 | Expression: c.getVersion()
 Source file: EE11Compatibility.java
-Jakarta Servlet 6.1 
- The method Cookie.getVersion() is terminally deprecated and marked for removal. 
+Jakarta Servlet 6.1
+ The method Cookie.getVersion() is terminally deprecated and marked for removal.
  This method is no longer required with RFC 6265.
-Your application will not work in future releases. 
- Remove all calls to Cookie.getVersion(). 
- Cookie version is not supported in RFC 6265 and should not be used. 
+Your application will not work in future releases.
+ Remove all calls to Cookie.getVersion().
+ Cookie version is not supported in RFC 6265 and should not be used.
  Modern browsers follow RFC 6265 which does not use cookie versions.
-[ERROR] Line of code: 44 | Expression: System.getSecurityManager()
+[ERROR] Line of code: 83 | Expression: System.getSecurityManager()
 Source file: LegacyBean.java
-Jakarta Authorization 3.0 
+Jakarta Authorization 3.0
  Since Jakarta Authorization 3.0 all references for Security Manager were removed.
-Your application won't work, 
+Your application won't work,
  please remove System#getSecurityManager method because it will not compile in Jakarta EE 11.
-[WARNING] Line of code: 11 | Expression: java.util.Calendar
+[WARNING] Line of code: 50 | Expression: java.util.Calendar
 Source file: LegacyBean.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.
-[WARNING] Line of code: 7 | Expression: jakarta.persistence.TemporalType
+[WARNING] Line of code: 46 | Expression: jakarta.persistence.TemporalType
 Source file: LegacyBean.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.
-[ERROR] Line of code: 3 | Expression: jakarta.annotation.ManagedBean
+[ERROR] Line of code: 42 | Expression: jakarta.annotation.ManagedBean
 Source file: LegacyBean.java
-Jakarta Annotations 3.0 issue 114 
+Jakarta Annotations 3.0 issue 114
  Since 3.0 the annotation jakarta.annotation.ManagedBean was removed.
-Your application won't work, 
- please remove annotation jakarta.annotation.ManagedBean and replace with 
+Your application won't work,
+ please remove annotation jakarta.annotation.ManagedBean and replace with
  CDI scopes and naming.
-[WARNING] Line of code: 6 | Expression: jakarta.persistence.Temporal
+[WARNING] Line of code: 45 | Expression: jakarta.persistence.Temporal
 Source file: LegacyBean.java
-Jakarta Persistence 3.2 
+Jakarta Persistence 3.2
  since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.  
- But it is recommended to substitute with java.time API. In future releases for Jakarta, 
+This issue won't affect your application.
+ But it is recommended to substitute with java.time API. In future releases for Jakarta,
  maintaining deprecated types will cause issues on your application.

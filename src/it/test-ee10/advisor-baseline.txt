@@ -1,6 +1,6 @@
 [INFO] Showing Advisories
 [INFO] ***************
-[INFO] Line of code: 37 | Expression: javax.persistence.EntityManager
+[INFO] Line of code: 76 | Expression: javax.persistence.EntityManager
 Source file: ExampleDeprecatedAPI.java
 Jakarta Persistence 3.1
  EntityManager interface now implements AutoCloseable.

@@ -282,6 +282,7 @@
                     </goals>
                     <mavenOpts>-Djacoco.skip=true</mavenOpts>
                     <projectsDirectory>src/it</projectsDirectory>
+                    <cloneProjectsTo>test/it</cloneProjectsTo>
                     <properties>
                         <maven.compiler.skip>true</maven.compiler.skip>
                         <plugin.version>${project.version}</plugin.version>
