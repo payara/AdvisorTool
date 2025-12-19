@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +73,7 @@ public class AdvisorClassImport implements AdvisorInterface {
         public void visit(final ImportDeclaration importDeclaration, final List<AdvisorBean> collector) {
             super.visit(importDeclaration, collector);
             Optional<Position> p = importDeclaration.getBegin();
-            if (normalizeImportDeclaration(importDeclaration).endsWith(valuePattern)) {
+            if (normalizeImportDeclarationAndValidate(importDeclaration, valuePattern)) {
                 AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern)
                         .setLine((p.map(position -> "" + position.line).orElse("")))
                                 .setImportDeclaration(importDeclaration.getNameAsString()).build();
@@ -81,7 +82,7 @@ public class AdvisorClassImport implements AdvisorInterface {
         }
     }
 
-    private static String normalizeImportDeclaration(ImportDeclaration importDeclaration) {
-        return importDeclaration.toString().split(";")[0];
+    private static boolean normalizeImportDeclarationAndValidate(ImportDeclaration importDeclaration, String valuePattern) {
+        return Arrays.stream(importDeclaration.toString().split(";")).anyMatch(s -> s.endsWith(valuePattern));
     }
 }

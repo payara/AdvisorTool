@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -108,7 +108,8 @@ public class AdvisorAnnotationWithProperty implements AdvisorInterface {
             super.visit(markerAnnotationExpr, collector);
             Optional<Position> p = markerAnnotationExpr.getBegin();
             String annotationName = valuePattern.substring(valuePattern.lastIndexOf(".") + 1, valuePattern.length());
-            if (markerAnnotationExpr.toString().contains(annotationName) && markerAnnotationExpr.toString().contains(secondPattern)) {
+            String annotationValue = markerAnnotationExpr.toString().substring(1);
+            if (annotationValue.equals(annotationName) && markerAnnotationExpr.toString().contains(secondPattern)) {
                 AdvisorBean advisorBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, annotationName + "@" + secondPattern)
                         .setLine((p.map(position -> "" + position.line).orElse("")))
                         .setAnnotationDeclaration(markerAnnotationExpr.toString()).build();

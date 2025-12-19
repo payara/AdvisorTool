@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023-2024 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -153,18 +153,13 @@ public class AdvisorEvaluator {
         String annotationPropertyDeclaration = value.substring(value.indexOf("@") + 1, value.length());
         //search import
         AdvisorBean advisorBean = null;
-        AdvisorClassImport acimp = new AdvisorClassImport();
         try {
-            advisorBean = acimp.parseFile(key, importAnnotationNameSpace, sourceFile);
-            //check if annotation with property
-            if (advisorBean != null) {
-                AdvisorAnnotationWithProperty aacwp = new AdvisorAnnotationWithProperty();
-                advisorBean = aacwp.parseFile(key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
-                if(advisorBean != null && !advisorsList.contains(advisorBean)) {
-                    advisorsList.add(advisorBean);
-                }
+            AdvisorAnnotationWithProperty aacwp = new AdvisorAnnotationWithProperty();
+            advisorBean = aacwp.parseFile(key, importAnnotationNameSpace, annotationPropertyDeclaration, sourceFile);
+            if (advisorBean != null && !advisorsList.contains(advisorBean)) {
+                advisorsList.add(advisorBean);
             }
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
     }

@@ -118,31 +118,31 @@ Jakarta Authorization 3.0
  Since Jakarta Authorization 3.0 all references for Security Manager were removed.
 Your application won't work,
  please remove System#getSecurityManager method because it will not compile in Jakarta EE 11.
-[WARNING] Line of code: 50 | Expression: java.util.Calendar
-Source file: LegacyBean.java
-Jakarta Persistence 3.2
- since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.
- But it is recommended to substitute with java.time API. In future releases for Jakarta,
- maintaining deprecated types will cause issues on your application.
-[WARNING] Line of code: 46 | Expression: jakarta.persistence.TemporalType
-Source file: LegacyBean.java
-Jakarta Persistence 3.2
- since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.
- But it is recommended to substitute with java.time API. In future releases for Jakarta,
- maintaining deprecated types will cause issues on your application.
-[ERROR] Line of code: 42 | Expression: jakarta.annotation.ManagedBean
-Source file: LegacyBean.java
-Jakarta Annotations 3.0 issue 114
- Since 3.0 the annotation jakarta.annotation.ManagedBean was removed.
-Your application won't work,
- please remove annotation jakarta.annotation.ManagedBean and replace with
- CDI scopes and naming.
-[WARNING] Line of code: 45 | Expression: jakarta.persistence.Temporal
-Source file: LegacyBean.java
-Jakarta Persistence 3.2
- since Jakarta Persistence 3.2 this type was marked for deprecation.
-This issue won't affect your application.
- But it is recommended to substitute with java.time API. In future releases for Jakarta,
- maintaining deprecated types will cause issues on your application.
+ [WARNING] Line of code: 46 | Expression: jakarta.persistence.TemporalType                                                                                      
+Source file: LegacyBean.java                                                                                                                                   
+Jakarta Persistence 3.2                                                                                                                                        
+since Jakarta Persistence 3.2 this type was marked for deprecation.                                                                                            
+This issue won't affect your application.                                                                                                                      
+But it is recommended to substitute with java.time API. In future releases for Jakarta,                                                                        
+maintaining deprecated types will cause issues on your application.                                                                                            
+[ERROR] Line of code: 42 | Expression: jakarta.annotation.ManagedBean                                                                                          
+Source file: LegacyBean.java                                                                                                                                   
+Jakarta Annotations 3.0 issue 114                                                                                                                              
+Since 3.0 the annotation jakarta.annotation.ManagedBean was removed.                                                                                           
+Your application won't work,                                                                                                                                   
+please remove annotation jakarta.annotation.ManagedBean and replace with                                                                                       
+CDI scopes and naming.                                                                                                                                         
+[WARNING] Line of code: 45 | Expression: jakarta.persistence.Temporal                                                                                          
+Source file: LegacyBean.java                                                                                                                                   
+Jakarta Persistence 3.2                                                                                                                                        
+since Jakarta Persistence 3.2 this type was marked for deprecation.                                                                                            
+This issue won't affect your application.                                                                                                                      
+But it is recommended to substitute with java.time API. In future releases for Jakarta,                                                                        
+maintaining deprecated types will cause issues on your application.                                                                                            
+[WARNING] Line of code: 50 | Expression: java.util.Calendar                                                                                                    
+Source file: LegacyBean.java                                                                                                                                   
+Jakarta Persistence 3.2                                                                                                                                        
+since Jakarta Persistence 3.2 this type was marked for deprecation.                                                                                            
+This issue won't affect your application.                                                                                                                      
+But it is recommended to substitute with java.time API. In future releases for Jakarta,                                                                        
+maintaining deprecated types will cause issues on your application. 

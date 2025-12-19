@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2023 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023-2025 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,11 +58,38 @@ public interface AdvisorInterface {
         VoidVisitor<List<AdvisorBean>> collector = createVoidVisitor(keyPattern, valuePattern, params);
         CompilationUnit compilationUnit = StaticJavaParser.parse(f);
         collector.visit(compilationUnit, advisorBeanList);
-        if (advisorBeanList.size() > 0) {
+        if (!advisorBeanList.isEmpty()) {
             AdvisorBean b = advisorBeanList.get(0);
-            b.setFile(f);
-            return b;
+            String importDeclaration = b.getImportDeclaration();
+            if (importDeclaration != null && (valuePattern.contains("jakarta") || valuePattern.contains("javax"))) {
+                return compareImports(importDeclaration, valuePattern, b, f);
+            } else if (importDeclaration != null) {
+                importDeclaration = removingPrefixFromNameSpace(importDeclaration);
+                return compareImports(importDeclaration, valuePattern, b, f);
+            } else if (importDeclaration == null) {
+                b.setFile(f);
+                return b;
+            }
         }
         return null;
+    }
+
+    private String removingPrefixFromNameSpace(String importDeclaration) {
+        if (importDeclaration.contains("javax")) {
+            int position = importDeclaration.indexOf("javax");
+            return importDeclaration.substring(position + 6);
+        } else if (importDeclaration.contains("jakarta")) {
+            int position = importDeclaration.indexOf("jakarta");
+            return importDeclaration.substring(position + 8);
+        }
+        return importDeclaration;
+    }
+
+    private AdvisorBean compareImports(String importDeclaration, String valuePattern, AdvisorBean b, File f) {
+        if (this instanceof AdvisorClassImport && !importDeclaration.equals(valuePattern)) {
+            return null;
+        }
+        b.setFile(f);
+        return b;
     }
 }
