@@ -1,73 +1,46 @@
 # AdvisorTool
-This initial project to make the advisor tool
 
-To use please follow next steps 
+Payara Advisor Maven Plugin analyzes a Java project's source code, JSP/JSF pages, and configuration files and reports API compatibility issues that need to be addressed before upgrading to a newer version of Jakarta EE or MicroProfile.
 
-download project
+## Supported upgrade paths
 
-```
+| Goal | Supported versions |
+|------|--------------------|
+| `advise` | Jakarta EE 10, Jakarta EE 11 |
+| `microprofile-advise` | MicroProfile 6 |
+
+## Quick start
+
+Build and install the plugin:
+
+```bash
 git clone https://github.com/payara/AdvisorTool.git
-```
-
-move to the  master branch
-
-```
-git checkout master 
-```
-
-build the project:
-
-```
+cd AdvisorTool
+git checkout master
 mvn clean install
 ```
 
-Execute Command under a project that you want to advise for jakarta 10
+Run from the root of the project you want to analyze:
 
-```
-mvn fish.payara.advisor:advisor-maven-plugin:1.1:advise -DadviseVersion=10
-```
+```bash
+# Jakarta EE 10
+mvn fish.payara.advisor:advisor-maven-plugin:advise -DadviseVersion=10
 
-Or
+# Jakarta EE 11
+mvn fish.payara.advisor:advisor-maven-plugin:advise -DadviseVersion=11
 
-Execute Command under a project that you want to advise for jakarta 11
-
-```
-mvn fish.payara.advisor:advisor-maven-plugin:1.1:advise -DadviseVersion=11
-```
-
-Or
-
-
-Execute Command under a project that you want to advise for microprofile 6
-
-```
-mvn fish.payara.advisor:advisor-maven-plugin:1.1:microprofile-advise
+# MicroProfile 6
+mvn fish.payara.advisor:advisor-maven-plugin:microprofile-advise
 ```
 
-
-if a pattern matchs you will see something like the following:
-
-```
-[INFO] Showing advice
-[INFO] ********
- Jakarta Authorization 2.1
- Issue # 105
- jakarta.security.jacc.PolicyContext.getContext(String) was changed from
- public static Object getContext(String key) throws PolicyContextException {
- to
- public static <T> T getContext(String key) throws PolicyContextException {
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-```
+For full usage information, including all parameters, output format, and configuration options, see **[docs/usage.md](docs/usage.md)**.
 
 ## Integration tests
 
 To run the tests:
 
 ```
-
 mvn verify -Pintegration
-
 ```
 
 Tests run the advisor tool against 3 test projects:
