@@ -58,12 +58,17 @@ public class AdvisorToolMojo extends AbstractMojo {
     private static final Logger log = Logger.getLogger(AdvisorToolMojo.class.getName());
 
     private static final String ADVISE_VERSION = "adviseVersion";
-    
+    private static final String FORMAT = "format";
+
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject projectConfig;
 
     @Parameter(property = "advisor-plugin.adviseVersion", defaultValue = "10")
     private String adviseVersion;
+
+    /** Output format: 'text' (default) or 'json' for machine-readable output. */
+    @Parameter(property = "advisor-plugin.format", defaultValue = "text")
+    private String format;
 
     @Override
     public void execute() {
@@ -74,6 +79,9 @@ public class AdvisorToolMojo extends AbstractMojo {
         AdvisorEvaluator advisorEvaluator = new AdvisorEvaluator();
         if (properties.getProperty(ADVISE_VERSION) != null) {
             this.adviseVersion = properties.getProperty(ADVISE_VERSION);
+        }
+        if (properties.getProperty(FORMAT) != null) {
+            this.format = properties.getProperty(FORMAT);
         }
         try {
             if (adviseVersion != null && !adviseVersion.isEmpty()) {
@@ -104,7 +112,11 @@ public class AdvisorToolMojo extends AbstractMojo {
             //print messages
             advisorMessageProcessor.addMessages(advisorBeans, adviseVersion);
 
-            advisorMessageProcessor.printToConsole(advisorBeans, this.getLog());
+            if ("json".equalsIgnoreCase(format)) {
+                advisorMessageProcessor.printToJson(advisorBeans, adviseVersion, this.getLog());
+            } else {
+                advisorMessageProcessor.printToConsole(advisorBeans, this.getLog());
+            }
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
