@@ -102,7 +102,7 @@ public class AdvisorLoader {
     public List<File> loadSourceFiles(File baseDir) throws IOException {
         List<File> javaFiles = new ArrayList<>();
         if (baseDir != null) {
-            javaFiles = Files.walk(Paths.get(baseDir.toURI()))
+            javaFiles = Files.walk(baseDir.toPath())
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".java"))
                     .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
@@ -115,7 +115,7 @@ public class AdvisorLoader {
     public List<File> loadJSPandJSFFiles(File baseDir) throws IOException {
         List<File> jspFiles = new ArrayList<>();
         if (baseDir != null) {
-            jspFiles = Files.walk(Paths.get(baseDir.toURI()))
+            jspFiles = Files.walk(baseDir.toPath())
                     .filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".jsp") || p.toString().endsWith(".xhtml"))
                     .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))
@@ -128,7 +128,7 @@ public class AdvisorLoader {
     public List<File> loadConfigFiles(File baseDir) throws IOException {
         List<File> configFiles = new ArrayList<>();
         if (baseDir != null) {
-            configFiles = Files.walk(Paths.get(baseDir.toURI()))
+            configFiles = Files.walk(baseDir.toPath())
                     .filter(Files::isRegularFile).filter(p -> p.toString().endsWith(".xml")
                             || p.toString().endsWith(".properties"))
                     .filter(p -> !p.toString().contains(File.separator + "target" + File.separator))

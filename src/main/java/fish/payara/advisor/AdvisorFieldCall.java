@@ -74,7 +74,7 @@ public class AdvisorFieldCall implements AdvisorInterface {
         public void visit(FieldAccessExpr fieldAccessExpr, List<AdvisorBean> advisorBeanList) {
             super.visit(fieldAccessExpr, advisorBeanList);
             Optional<Position> p = fieldAccessExpr.getBegin();
-            if(fieldAccessExpr.isFieldAccessExpr() && fieldAccessExpr.toString().contains(valuePattern)) {
+            if(fieldAccessExpr.isFieldAccessExpr() && fieldAccessExpr.getNameAsString().equals(valuePattern)) {
                 AdvisorBean advisorFieldBean = new AdvisorBean.AdvisorBeanBuilder(keyPattern, valuePattern).
                         setLine((p.map(position -> "" + position.line).orElse("")))
                         .setMethodDeclaration(fieldAccessExpr.toString()).build();
