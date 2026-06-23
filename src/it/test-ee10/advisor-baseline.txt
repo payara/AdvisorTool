@@ -1,8 +1,446 @@
 [INFO] Showing Advisories
 [INFO] ***************
+[WARNING] Line of code: 202 | Expression: bbd.addAnnotatedType(at)
+Source file: EE10LegacyApp.java
+This method with AnnotatedType as single parameter is deprecated from CDI 1.1
+BeforeBeanDiscovery#addAnnotatedType(AnnotatedType, String) should be used instead.
+[ERROR] Line of code: 211 | Expression: sc.getServletNames()
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 ServletContext#getServletNames method is deprecated. Now it was removed with no replacement.
+Your application won't work, please remove ServletContext#getServletNames method because it will not compile in Jakarta EE 10
+[ERROR] Line of code: 301 | Expression: sm.saveSerializedView(null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated SerializedView inner class was removed.
+Your application won't work, please remove StateManager.SerializedView call.
+[ERROR] Line of code: 74 | Expression: javax.faces.el.ReferenceSyntaxException
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like ReferenceSyntaxException used for old EL implementation was removed.
+Your application won't work, 
+ please remove class ReferenceSyntaxException and replace with the class jakarta.el.ELException from Jakarta Expression Language
+[ERROR] Line of code: 94 | Expression: javax.faces.component.MethodBindingValidator
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like MethodBindingValidator used for old EL implementation was removed.
+Your application won't work, 
+ please remove class MethodBindingValidator and replace with new classes from Jakarta Expression Language
+[ERROR] Line of code: 313 | Expression: UIComponent.HONOR_CURRENT_COMPONENT_ATTRIBUTES_PARAM_NAME
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1571 
+ Since 4.0 deprecated constant HONOR_CURRENT_COMPONENT_ATTRIBUTES_PARAM_NAME from UIComponent class was removed.
+Your application won't work, please remove UIComponent.HONOR_CURRENT_COMPONENT_ATTRIBUTES_PARAM_NAME call.
+[WARNING] Line of code: 55 | Expression: jakarta.annotation.ManagedBean
+Source file: EE10LegacyApp.java
+Jakarta Annotations 2.1.1 
+ Since 2.1.1 the annotation jakarta.annotation.ManagedBean was marked as deprecated.
+This issue won't affect your application. 
+ Please try to replace annotation jakarta.annotation.ManagedBean by 
+ CDI scopes and naming. For future releases this annotation will be removed.
+[ERROR] Line of code: 60 | Expression: javax.servlet.SingleThreadModel
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ SingleThreadModel class was removed.
+Your application won't work, please remove SingleThreadModel class because it will not compile in Jakarta EE 10.
+[ERROR] Line of code: 81 | Expression: javax.faces.bean.ManagedBean
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.ManagedBean related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.ManagedBean and replace with 
+ CDI scopes and naming
+[ERROR] Line of code: 301 | Expression: sm.saveSerializedView(null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method saveSerializedView from StateManager class was removed.
+Your application won't work, please remove StateManager.saveSerializedView(FacesContext context) call.
+[WARNING] Line of code: 277 | Expression: new NewCookie("name", "value")
+Source file: EE10LegacyApp.java
+Jakarta RESTful 3.1 
+ Constructors for NewCookie class were deprecated.
+This issue won't affect your application. 
+ The advice is to change for NewCookie.Builder class.
+[WARNING] Line of code: 322 | Expression: arrRes.getFeatureDescriptors(elCtx, null)
+Source file: EE10LegacyApp.java
+Jakarta Server Pages 3.1 
+ Since Jakarta Server Pages 3.1 ELResolver#getFeatureDescriptors method is deprecated.
+This issue won't affect your application. 
+ To prevent future issues stop using #getFeatureDescriptors(ELContext, Object)
+[INFO] Line of code: 269 | Expression: PolicyContext.getContext("javax.servlet.http.HttpServletRequest")
+Source file: EE10LegacyApp.java
+Jakarta Authorization 2.1 Issue # 105 
+ jakarta.security.jacc.PolicyContext.getContext(String) was changed from 
+ public static Object getContext(String key) throws PolicyContextException { 
+ to 
+ public static <T> T getContext(String key) throws PolicyContextException {
+This issue won't affect your application. 
+ The recommendation is to take care of the generic version.
+[WARNING] Line of code: 198 | Expression: bm.createInjectionTarget(at)
+Source file: EE10LegacyApp.java
+This method is deprecated from CDI 1.1
+BeanManager.getInjectionTargetFactory(AnnotatedType) should be used instead.
+[ERROR] Line of code: 180 | Expression: ejbContext.getCallerIdentity()
+Source file: EE10LegacyApp.java
+Jakarta Enterprise Beans 4.0 
+ since Jakarta Enterprise Beans 4.0 the method EJBContext.getCallerIdentity() was removed. 
+ It relied on java.security.Identity which was removed from the Java platform.
+Your application won't work. 
+ Remove all calls to EJBContext.getCallerIdentity(). 
+ Use EJBContext.getCallerPrincipal() to obtain the caller's principal instead. 
+ Example: Principal caller = sessionContext.getCallerPrincipal();
+[WARNING] Line of code: 43 | Expression: javax.enterprise.inject.New
+Source file: EE10LegacyApp.java
+The New qualifier was deprecated in CDI 1.1 and REMOVED in CDI 4.0
+CDI applications must inject Dependent scoped beans instead.
+[INFO] Line of code: 123 | Expression: javax.persistence.GenerationType
+Source file: EE10LegacyApp.java
+Jakarta Persistence 3.1 
+ new generation type was added of type UUID.
+This issue won't affect your application. 
+ Now you can use a new type for generation of ID's based on RFC 4122 Universally Unique Identifier.
+[ERROR] Line of code: 68 | Expression: javax.servlet.http.HttpUtils
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ HttpUtils class was removed.
+Your application won't work, please remove HttpUtils class because it will not compile in Jakarta EE 10.
+[INFO] Line of code: 255 | Expression: mi.getMap()
+Source file: EE10LegacyApp.java
+Jakarta Authentication 3.0 Issue # 87 
+ jakarta.security.auth.message.MessageInfo.getMap was changed from 
+ Map getMap(); 
+ to 
+ Map<String, Object> getMap();
+This issue won't affect your application. 
+ The recommendation is to take care of the generic version.
+[ERROR] Line of code: 304 | Expression: sm.getComponentStateToSave(null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method getComponentStateToSave from StateManager class was removed.
+Your application won't work, please remove StateManager.getComponentStateToSave(FacesContext context) call.
+[ERROR] Line of code: 217 | Expression: req.isRequestedSessionIdFromUrl()
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 4.0 HttpServletRequestWrapper#isRequestedSessionIdFromUrl method is deprecated. Now it was removed.
+Your application won't work, use #isRequestedSessionIdFromURL instead.
+[ERROR] Line of code: 307 | Expression: sm.restoreTreeStructure(null, null, null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method restoreTreeStructure from StateManager class was removed.
+Your application won't work, please remove StateManager.restoreTreeStructure(FacesContext context, String viewId, String renderKitId) call.
+[INFO] Line of code: 260 | Expression: acf.providerRegistrationSecurityPermission()
+Source file: EE10LegacyApp.java
+Jakarta Authentication 3.0 Issue # 138 
+ jakarta.security.auth.message.config.AuthConfigFactory.providerRegistrationSecurityPermission was marked as deprecated 
+ We recommend to stop using because in next releases of Jakarta this will be removed.
+This issue won't affect your application. 
+ The recommendation is to take care because on next releases of Jakarta this will be removed.
+[ERROR] Line of code: 85 | Expression: javax.faces.bean.NoneScoped
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.NoneScoped related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.NoneScoped and replace with 
+ class jakarta.enterprise.context.Dependent from CDI
+[ERROR] Line of code: 71 | Expression: javax.faces.el.MethodBinding
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like MethodBinding used for old EL implementation was removed.
+Your application won't work, 
+ please remove class MethodBinding and replace with the class jakarta.el.MethodExpression from Jakarta Expression Language
+[ERROR] Line of code: 86 | Expression: javax.faces.bean.ViewScoped
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.ViewScoped related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.ViewScoped and replace with 
+ class jakarta.faces.view.ViewScoped that is a CDI custom scope
+[ERROR] Line of code: 237 | Expression: session.getValue("myKey")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 HttpSession#getValue method is deprecated. Now it was removed.
+Your application won't work, use #getAttribute instead.
+[ERROR] Line of code: 209 | Expression: sc.getServlet("myServlet")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 ServletContext#getServlet method is deprecated. Now it was removed with no replacement.
+Your application won't work, please remove ServletContext#getServlet method because it will not compile in Jakarta EE 10
+[INFO] Line of code: 129 | Expression: javax.ws.rs.ext.ContextResolver
+Source file: EE10LegacyApp.java
+Jakarta RESTful 3.1 
+ JSON-B entity providers must favor Jsonb instances provided by ContextResolver<Jsonb>
+This issue won't affect your application. 
+ Whenever you use ContextResolver for JSON-B entities, the recommendation is to use Jsonb instances.
+[ERROR] Line of code: 306 | Expression: sm.restoreView(null, null, null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method restoreView from StateManager class was removed.
+Your application won't work, please remove StateManager.restoreView(FacesContext facesContext, String s, String s1) call.
+[ERROR] Line of code: 227 | Expression: resp.setStatus(200, "OK")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 HttpServletResponseWrapper#setStatus(int, String) method is deprecated due to ambiguous meaning of the message parameter. 
+ Now it was removed.
+Your application won't work, to set a status code use #setStatus(int), to send an error with a description use #sendError(int, String).
+[WARNING] Line of code: 276 | Expression: new Cookie("name", "value")
+Source file: EE10LegacyApp.java
+Jakarta RESTful 3.1 
+ Constructors for Cookie class were deprecated.
+This issue won't affect your application. 
+ The advice is to change for Cookie.Builder class.
+[ERROR] Line of code: 78 | Expression: javax.faces.el.EvaluationException
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like EvaluationException used for old EL implementation was removed.
+Your application won't work, 
+ please remove class EvaluationException and replace with the class jakarta.el.ELException from Jakarta Expression Language
+[ERROR] Line of code: 225 | Expression: resp.encodeUrl("/path")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 HttpServletResponse#encodeUrl method is deprecated. Now it was removed.
+Your application won't work, use #encodeURL instead.
+[ERROR] Line of code: 240 | Expression: session.removeValue("myKey")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 HttpSession#removeValue method is deprecated. Now it was removed.
+Your application won't work, use #removeAttribute instead.
+[ERROR] Line of code: 216 | Expression: req.getRealPath("/index.html")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 ServletRequestWrapper#getRealPath method is deprecated. Now it was removed.
+Your application won't work, use ServletContext#getRealPath instead.
+[INFO] Line of code: 258 | Expression: acf.getFactorySecurityPermission()
+Source file: EE10LegacyApp.java
+Jakarta Authentication 3.0 Issue # 138 
+ jakarta.security.auth.message.config.AuthConfigFactory.getFactorySecurityPermission was marked as deprecated 
+ We recommend to stop using because in next releases of Jakarta this will be removed.
+This issue won't affect your application. 
+ The recommendation is to take care because on next releases of Jakarta this will be removed.
+[ERROR] Line of code: 302 | Expression: sm.saveView(null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method saveView from StateManager class was removed.
+Your application won't work, please remove StateManager.saveView(FacesContext context) call.
+[ERROR] Line of code: 249 | Expression: new UnavailableException(targetServlet, "unavailable")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 UnavailableException(Servlet, String) constructor is deprecated. Now it was removed.
+Your application won't work, use UnavailableException(String) instead.
+[INFO] Line of code: 122 | Expression: javax.persistence.EntityManagerFactory
+Source file: EE10LegacyApp.java
+Jakarta Persistence 3.1 
+ EntityManagerFactory interface now implements AutoCloseable.
+This issue won't affect your application. 
+ Now you can use try-with-resources when calling EntityManagerFactory to improve resources usage.
+[ERROR] Line of code: 341 | Expression: lambda.isParmetersProvided()
+Source file: EE10LegacyApp.java
+Jakarta Expression Language 5.0 issue 117 
+ MethodExpression.isParmetersProvided() has been removed.
+Your application won't work, please remove MethodExpression.isParmetersProvided() call.
+[WARNING] Line of code: 194 | Expression: bm.fireEvent(new Object())
+Source file: EE10LegacyApp.java
+Deprecated since CDI 2.0; this method was insufficient ever since CDI introduced async events
+BeanManager.getEvent should be used instead.
+[ERROR] Line of code: 305 | Expression: sm.writeState(null, sv)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method writeState from StateManager class was removed.
+Your application won't work, please remove StateManager.writeState(FacesContext context, SerializedView state) call.
+[ERROR] Line of code: 226 | Expression: resp.encodeRedirectUrl("/redirect")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 HttpServletResponseWrapper#encodeRedirectUrl method is deprecated. Now it was removed.
+Your application won't work, use #encodeRedirectURL instead.
+[INFO] Line of code: 121 | Expression: javax.persistence.EntityManager
+Source file: EE10LegacyApp.java
+Jakarta Persistence 3.1 
+ EntityManager interface now implements AutoCloseable.
+This issue won't affect your application. 
+ Now you can use try-with-resources when calling EntityManager to improve resources usage.
+[ERROR] Line of code: 72 | Expression: javax.faces.el.ValueBinding
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like ValueBinding used for old EL implementation was removed.
+Your application won't work, 
+ please remove class ValueBinding and replace with the class jakarta.el.ValueExpression from Jakarta Expression Language
+[ERROR] Line of code: 212 | Expression: sc.log(new Exception("legacy log"), "legacy message")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 ServletContext#log(Exception, String) method is deprecated. Now it was removed.
+Your application won't work, use ServletContext#log(String message, Throwable throwable) instead.
+[ERROR] Line of code: 84 | Expression: javax.faces.bean.ApplicationScoped
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.ApplicationScoped related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.ApplicationScoped and replace with 
+ class jakarta.enterprise.context.ApplicationScoped that is a CDI build-in scope
+[INFO] Line of code: 263 | Expression: cac.getAuthContext("id", null, java.util.Collections.emptyMap())
+Source file: EE10LegacyApp.java
+Jakarta Authentication 3.0 Issue # 87 
+ jakarta.security.auth.message.config.ServerAuthConfig.getAuthContext was changed from 
+ ServerAuthContext getAuthContext(String authContextID, Subject serverSubject, Map properties) throws AuthException 
+ to 
+ ServerAuthContext getAuthContext(String authContextID, Subject serverSubject, Map<String, Object> properties) throws AuthException
+This issue won't affect your application. 
+ The recommendation is to take care of the generic version.
+[INFO] Line of code: 169 | Expression: @JMSDestinationDefinition(name = "java:/jms/queue/myQueue", interfaceName = "javax.jms.Queue", resourceAdapter = "activemq-rar")
+Source file: EE10LegacyApp.java
+Jakarta Messaging 3.1 
+ Annotation @JMSDestinationDefinition changed to be repeatable.
+This issue won't affect your application. 
+ Now you can use @JMSDestinationDefinition multiple times on the same component.
+[ERROR] Line of code: 209 | Expression: sc.getServlet("myServlet")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 UnavailableException#getServlet method is deprecated. Now it was removed with no replacement.
+Your application won't work, please remove UnavailableException#getServlet method because it will not compile in Jakarta EE 10.
+[ERROR] Line of code: 139 | Expression: javax.xml.bind.Validator
+Source file: EE10LegacyApp.java
+Jakarta Xml Binding 4.0 
+ Since 4.0 deprecated Validator class was removed
+Your application won't work, please remove Validator class because it will not compile in Jakarta EE 10
+[ERROR] Line of code: 82 | Expression: javax.faces.bean.RequestScoped
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.RequestScoped related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.RequestScoped and replace with 
+ class jakarta.enterprise.context.RequestScoped that is a CDI build-in scope
+[ERROR] Line of code: 77 | Expression: javax.faces.el.MethodNotFoundException
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like MethodNotFoundException used for old EL implementation was removed.
+Your application won't work, 
+ please remove class MethodNotFoundException and replace with the class jakarta.el.MethodNotFoundException from Jakarta Expression Language
+[ERROR] Line of code: 250 | Expression: new UnavailableException(60, targetServlet, "unavailable")
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 UnavailableException(int, Servlet, String) constructor is deprecated. Now it was removed.
+Your application won't work, use UnavailableException(String, int) instead.
+[ERROR] Line of code: 83 | Expression: javax.faces.bean.SessionScoped
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1547 
+ Since 4.0 deprecated classes like jakarta.faces.bean.SessionScoped related to manage bean system was removed.
+Your application won't work, 
+ please remove class jakarta.faces.bean.SessionScoped and replace with 
+ class jakarta.enterprise.context.SessionScoped that is a CDI build-in scope
+[INFO] Line of code: 190 | Expression: bean.isNullable()
+Source file: EE10LegacyApp.java
+As of CDI 1.1 this method is deprecated and can safely always return false.
+It is safe to just remove this method from any custom implementation of Bean interface as it was NOT used.
+[ERROR] Line of code: 311 | Expression: UIComponent.CURRENT_COMPONENT
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1571 
+ Since 4.0 deprecated constant CURRENT_COMPONENT from UIComponent class was removed.
+Your application won't work, 
+ please remove UIComponent.CURRENT_COMPONENT call, instead use method UIComponent.getCurrentComponent() from the class.
+[ERROR] Line of code: 236 | Expression: session.getSessionContext()
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.1 HttpSession#getSessionContext method is deprecated. Now it was removed with no replacement.
+Your application won't work, please remove HttpSession#getSessionContext method because it will not compile in Jakarta EE 10.
+[WARNING] Line of code: 183 | Expression: ejbContext.getEnvironment()
+Source file: EE10LegacyApp.java
+Jakarta Enterprise Beans 4.0 
+ since Jakarta Enterprise Beans 4.0 the method EJBContext.getEnvironment() was deprecated. 
+ Use @Resource injection to access environment entries instead.
+This issue won't affect your application immediately. 
+ But it is recommended to stop using EJBContext.getEnvironment(). 
+ Use @Resource injection to access named environment entries instead. 
+ Example: @Resource(name = "myEntry") private String myValue;
+[ERROR] Line of code: 67 | Expression: javax.servlet.http.HttpSessionContext
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ HttpSessionContext class was removed.
+Your application won't work, please remove HttpSessionContext class because it will not compile in Jakarta EE 10.
+[ERROR] Line of code: 308 | Expression: sm.restoreComponentState(null, null, null, null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method restoreComponentState from StateManager class was removed.
+Your application won't work, please remove StateManager.restoreComponentState(FacesContext context, UIViewRoot viewRoot, String renderKitId) call.
+[ERROR] Line of code: 210 | Expression: sc.getServlets()
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.0 ServletContext#getServlets method is deprecated. Now it was removed with no replacement.
+Your application won't work, please remove ServletContext#getServlets method because it will not compile in Jakarta EE 10
+[ERROR] Line of code: 75 | Expression: javax.faces.el.PropertyResolver
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like PropertyResolver used for old EL implementation was removed.
+Your application won't work, 
+ please remove class PropertyResolver and replace with the class jakarta.el.ELResolver from Jakarta Expression Language
+[ERROR] Line of code: 303 | Expression: sm.getTreeStructureToSave(null)
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1578 
+ Since 4.0 deprecated method getTreeStructureToSave from StateManager class was removed.
+Your application won't work, please remove StateManager.getTreeStructureToSave(FacesContext context) call.
+[ERROR] Line of code: 136 | Expression: javax.xml.soap.SOAPElementFactory
+Source file: EE10LegacyApp.java
+Jakarta SOAP Attachments 3.0 
+ SOAPElementFactory class was removed.
+Your application won't work, please remove SOAPElementFactory class because it will not compile in Jakarta EE 10
+[WARNING] Line of code: 162 | Expression: @JsonbProperty(nillable = true)
+Source file: EE10LegacyApp.java
+Jakarta JSON Binding 3.0 
+ property nillable from the JsonbProperty annotation was deprecated.
+This issue won't affect your application. 
+ and the recommendation is to stop use of the deprecated property nillable and 
+ start to use the JsonbNillable annotation.
+[ERROR] Line of code: 312 | Expression: UIComponent.CURRENT_COMPOSITE_COMPONENT
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1571 
+ Since 4.0 deprecated constant CURRENT_COMPOSITE_COMPONENT from UIComponent class was removed.
+Your application won't work, 
+ please remove UIComponent.CURRENT_COMPOSITE_COMPONENT call,  instead use method UIComponent.getCurrentCompositeComponent() from the class.
+[ERROR] Line of code: 76 | Expression: javax.faces.el.PropertyNotFoundException
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like PropertyNotFoundException used for old EL implementation was removed.
+Your application won't work, 
+ please remove class PropertyNotFoundException and replace with the class jakarta.el.PropertyNotFoundException from Jakarta Expression Language
+[ERROR] Line of code: 73 | Expression: javax.faces.el.VariableResolver
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like VariableResolver used for old EL implementation was removed.
+Your application won't work, 
+ please remove class VariableResolver and replace with the class jakarta.el.ELResolver from Jakarta Expression Language
+[ERROR] Line of code: 238 | Expression: session.getValueNames()
+Source file: EE10LegacyApp.java
+Jakarta Servlet 6.0 
+ Since Java Servlet API 2.2 HttpSession#getValueNames method is deprecated. Now it was removed.
+Your application won't work, use #getAttributeNames instead.
+[INFO] Line of code: 273 | Expression: Json.createObjectBuilder(jsonMap)
+Source file: EE10LegacyApp.java
+Jakarta JSON Processing 2.1 
+ method Json.createObjectBuilder with Map parameter was changed from 
+ public static JsonObjectBuilder createObjectBuilder(Map<String, Object> map) { 
+ to 
+ public static JsonObjectBuilder createObjectBuilder(Map<String, ?> map) {
+This issue won't affect your application. 
+ The recommendation is to take care of the generic version.
+[ERROR] Line of code: 93 | Expression: javax.faces.component.MethodBindingValueChangeListener
+Source file: EE10LegacyApp.java
+Jakarta Faces 4.0 issue 1548 
+ Since 4.0 deprecated classes like MethodBindingValueChangeListener used for old EL implementation was removed.
+Your application won't work, 
+ please remove class MethodBindingValueChangeListener and replace with new classes from Jakarta Expression Language
+[INFO] Line of code: 259 | Expression: acf.setFactorySecurityPermission(null)
+Source file: EE10LegacyApp.java
+Jakarta Authentication 3.0 Issue # 138 
+ jakarta.security.auth.message.config.AuthConfigFactory.setFactorySecurityPermission was marked as deprecated 
+ We recommend to stop using because in next releases of Jakarta this will be removed.
+This issue won't affect your application. 
+ The recommendation is to take care because on next releases of Jakarta this will be removed.
+[INFO] Line of code: 166 | Expression: @JMSConnectionFactoryDefinition(name = "java:/jms/myFactory", interfaceName = "javax.jms.ConnectionFactory", resourceAdapter = "activemq-rar")
+Source file: EE10LegacyApp.java
+Jakarta Messaging 3.1 
+ Annotation @JMSConnectionFactoryDefinition changed to be repeatable.
+This issue won't affect your application. 
+ Now you can use @JMSConnectionFactoryDefinition multiple times on the same component.
 [INFO] Line of code: 76 | Expression: javax.persistence.EntityManager
 Source file: ExampleDeprecatedAPI.java
-Jakarta Persistence 3.1
+Jakarta Persistence 3.1 
  EntityManager interface now implements AutoCloseable.
-This issue won't affect your application.
+This issue won't affect your application. 
  Now you can use try-with-resources when calling EntityManager to improve resources usage.

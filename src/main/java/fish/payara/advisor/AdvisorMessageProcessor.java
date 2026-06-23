@@ -100,8 +100,8 @@ public class AdvisorMessageProcessor {
         String keyIssue = null;
         Properties messageProperties = new Properties();
         String subSpec = keyPattern.contains("-interface") ? "-interface" : (keyPattern.contains("-method") ? "-method" : (
-                keyPattern.contains("-remove") ? "-remove" : (keyPattern.contains("-file") ? "-file": (
-                        keyPattern.contains("-namespace") ? "-namespace" : "-tag"))));
+                keyPattern.contains("-field") ? "-field" : (keyPattern.contains("-remove") ? "-remove" : (keyPattern.contains("-file") ? "-file": (
+                        keyPattern.contains("-namespace") ? "-namespace" : "-tag")))));
         String spec = keyPattern.substring(0, keyPattern.indexOf(subSpec));
         if(type.equals("message")) {
             fileMessageName = spec + "-messages.properties";
@@ -188,5 +188,87 @@ public class AdvisorMessageProcessor {
                 log.info(b.toString());
             }
         });
+    }
+
+    /**
+     * Emit advisor results as a JSON document. The output is a single object with
+     * an {@code adviseVersion} field and an {@code items} array. Each item carries
+     * the structured fields a downstream tool needs to address it precisely:
+     * severity, file, line, expression, expressionKind, spec, message, fix.
+     */
+    public void printToJson(List<AdvisorBean> advisorMethodBeanList, String adviseVersion, Log log) {
+        StringBuilder sb = new StringBuilder(256 + 128 * advisorMethodBeanList.size());
+        sb.append("{\n");
+        sb.append("  \"adviseVersion\": \"").append(jsonEscape(adviseVersion)).append("\",\n");
+        sb.append("  \"items\": [");
+        for (int i = 0; i < advisorMethodBeanList.size(); i++) {
+            AdvisorBean b = advisorMethodBeanList.get(i);
+            String severity = b.getType() != null ? b.getType().name() : "INFO";
+            String file = b.getFile() != null ? b.getFile().getName() : "";
+            String filePath = b.getFile() != null ? b.getFile().getAbsolutePath() : "";
+            String line = b.getLine() != null ? b.getLine() : "";
+            String expression = expressionOf(b);
+            String expressionKind = expressionKindOf(b);
+            String spec = b.getKeyPattern() != null ? b.getKeyPattern() : "";
+            String message = b.getAdvisorMessage() != null && b.getAdvisorMessage().getMessage() != null
+                    ? b.getAdvisorMessage().getMessage().trim() : "";
+            String fix = b.getAdvisorMessage() != null && b.getAdvisorMessage().getFix() != null
+                    ? b.getAdvisorMessage().getFix().trim() : "";
+
+            sb.append(i == 0 ? "\n" : ",\n");
+            sb.append("    {\n");
+            sb.append("      \"severity\": \"").append(jsonEscape(severity)).append("\",\n");
+            sb.append("      \"file\": \"").append(jsonEscape(file)).append("\",\n");
+            sb.append("      \"filePath\": \"").append(jsonEscape(filePath)).append("\",\n");
+            sb.append("      \"line\": \"").append(jsonEscape(line)).append("\",\n");
+            sb.append("      \"expression\": \"").append(jsonEscape(expression)).append("\",\n");
+            sb.append("      \"expressionKind\": \"").append(jsonEscape(expressionKind)).append("\",\n");
+            sb.append("      \"spec\": \"").append(jsonEscape(spec)).append("\",\n");
+            sb.append("      \"message\": \"").append(jsonEscape(message)).append("\",\n");
+            sb.append("      \"fix\": \"").append(jsonEscape(fix)).append("\"\n");
+            sb.append("    }");
+        }
+        sb.append(advisorMethodBeanList.isEmpty() ? "]\n" : "\n  ]\n");
+        sb.append("}");
+        // Plain System.out so the document is captured cleanly by any consumer
+        // parsing stdout - the Maven [INFO] prefix would corrupt the JSON.
+        System.out.println(sb);
+    }
+
+    private static String expressionOf(AdvisorBean b) {
+        if (b.getMethodDeclaration() != null) return b.getMethodDeclaration();
+        if (b.getAnnotationDeclaration() != null) return b.getAnnotationDeclaration();
+        return b.getImportDeclaration() != null ? b.getImportDeclaration() : "";
+    }
+
+    private static String expressionKindOf(AdvisorBean b) {
+        if (b.getMethodDeclaration() != null) return "method";
+        if (b.getAnnotationDeclaration() != null) return "annotation";
+        if (b.getImportDeclaration() != null) return "import";
+        return "other";
+    }
+
+    private static String jsonEscape(String s) {
+        if (s == null) return "";
+        StringBuilder out = new StringBuilder(s.length() + 8);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"':  out.append("\\\""); break;
+                case '\\': out.append("\\\\"); break;
+                case '\b': out.append("\\b"); break;
+                case '\f': out.append("\\f"); break;
+                case '\n': out.append("\\n"); break;
+                case '\r': out.append("\\r"); break;
+                case '\t': out.append("\\t"); break;
+                default:
+                    if (c < 0x20) {
+                        out.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        out.append(c);
+                    }
+            }
+        }
+        return out.toString();
     }
 }

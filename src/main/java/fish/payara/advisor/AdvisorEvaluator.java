@@ -95,6 +95,12 @@ public class AdvisorEvaluator {
         AdvisorClassImport acimp = new AdvisorClassImport();
         try {
             advisorBean = acimp.parseFile(key, importNameSpace, sourceFile);
+            // Fallback: if not found directly, try the outer class import (handles inner-class
+            // references like Link.JaxbLink where only the outer Link class is imported)
+            if (advisorBean == null && importNameSpace.contains(".")) {
+                String outerNameSpace = importNameSpace.substring(0, importNameSpace.lastIndexOf("."));
+                advisorBean = acimp.parseFile(key, outerNameSpace, sourceFile);
+            }
             //check if method call
             if(advisorBean != null || importNameSpace.contains("System")) {
                 AdvisorMethodCall amc = new AdvisorMethodCall();
