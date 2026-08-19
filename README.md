@@ -1,52 +1,83 @@
 # AdvisorTool
+This initial project to make the advisor tool
 
-Maven plugin with two goals:
+To use please follow next steps 
 
-| Goal | Description |
-|------|-------------|
-| `advise` | Read-only analysis — reports Jakarta EE migration issues without changing anything |
-| `upgrade` | AI-powered migration — applies every recommendation to source files and compiles to verify |
+download project
 
----
+```
+git clone https://github.com/payara/AdvisorTool.git
+```
 
-## How is this different from pasting code into Claude?
+move to the  master branch
 
-A common question: why not just copy your files into Claude (or any LLM) and ask it to migrate them?
+```
+git checkout master 
+```
 
-### The advisor provides grounded, structured analysis
+build the project:
 
-When you paste code into a chat window, the LLM guesses what needs to change based on its training data. It may hallucinate removals, miss subtle deprecations, or apply changes that were correct for one version but not another.
+```
+mvn clean install
+```
 
-The Payara Upgrade Advisor is a static analysis tool that was built specifically to know about every API change across Jakarta EE versions. Before the AI agent writes a single line of code, the advisor has already produced a precise inventory:
+Execute Command under a project that you want to advise for jakarta 10
 
-- which file
-- which line
-- which expression (import, annotation, method call, field, constant)
-- which specification introduced the change
-- the severity (ERROR = will break, WARN = deprecated, INFO = informational)
-- a concrete fix description
+```
+mvn fish.payara.advisor:advisor-maven-plugin:1.1:advise -DadviseVersion=10
+```
 
-The AI agent never has to guess what needs changing. It receives exact coordinates and instructions, and its job is only to apply them correctly across the whole file.
+Or
 
-### It is agentic — a perceive-act loop, not a one-shot prompt
+Execute Command under a project that you want to advise for jakarta 11
 
-Pasting code into a chat is a single request and response. The `upgrade` goal runs an agent that acts in a loop:
+```
+mvn fish.payara.advisor:advisor-maven-plugin:1.1:advise -DadviseVersion=11
+```
 
-1. **Perceive** — the advisor runs and returns structured findings for the current state of the project.
-2. **Act** — the agent calls tools to read files, write corrected versions, and compile.
-3. **Verify** — `mvn compile` is called after each batch of edits. If it fails, the agent reads the compiler error, re-reads the offending file, fixes it, and compiles again.
-4. **Repeat** — the advisor runs again on the updated project. If new issues surface (or old ones remain), another round begins.
+Or
 
-The agent has a set of tools it can invoke autonomously:
 
-| Tool | What it does |
-|------|--------------|
-| `read_source_file` | Read a project source file |
-| `write_source_file` | Overwrite a file with corrected content |
-| `apply_source_edit` | Make a targeted replacement within a file |
-| `compile_maven_project` | Run `mvn compile` and return the output |
-| `search_in_project` | Search across source files with a regex |
-| `bulk_replace_in_project` | Replace a pattern across all matching files |
+Execute Command under a project that you want to advise for microprofile 6
+
+```
+mvn fish.payara.advisor:advisor-maven-plugin:1.1:microprofile-advise
+```
+
+
+if a pattern matchs you will see something like the following:
+
+```
+[INFO] Showing advice
+[INFO] ********
+ Jakarta Authorization 2.1
+ Issue # 105
+ jakarta.security.jacc.PolicyContext.getContext(String) was changed from
+ public static Object getContext(String key) throws PolicyContextException {
+ to
+ public static <T> T getContext(String key) throws PolicyContextException {
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+```
+
+## Integration tests
+
+To run the tests:
+
+```
+
+mvn verify -Pintegration
+
+```
+
+Tests run the advisor tool against 3 test projects:
+* src/it/test-ee10
+* src/it/test-ee11
+* src/it/test-mp6
+
+Each test project contains a file advisor-baseline.txt, containing the list of advises the advisor tool is supposed to return.
+
+If the advises are modified, removed or updated, this baseline needs to be updated to match the changes.| `bulk_replace_in_project` | Replace a pattern across all matching files |
 
 The loop continues until the advisor finds nothing left to fix or the round limit is reached. A single chat session cannot do this — it has no way to run the compiler, observe the result, and react.
 
